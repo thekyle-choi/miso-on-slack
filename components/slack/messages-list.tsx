@@ -6,14 +6,12 @@ import type { Message } from "@/constants/messages"
 
 interface MessagesListProps {
   messages: Message[]
-  externalCount?: number
-  teamName?: string
+  containerRef?: React.RefObject<HTMLElement>
 }
 
 export function MessagesList({ 
   messages, 
-  externalCount = 9, 
-  teamName = "Salesforce team" 
+  containerRef
 }: MessagesListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -38,6 +36,7 @@ export function MessagesList({
           attachment={message.attachment}
           isLoading={message.isLoading}
           misoResult={message.misoResult}
+          containerRef={containerRef}
         />
       ))}
       <div ref={messagesEndRef} />

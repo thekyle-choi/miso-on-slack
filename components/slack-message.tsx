@@ -115,6 +115,7 @@ interface SlackMessageProps {
   }
   isLoading?: boolean
   misoResult?: string
+  containerRef?: React.RefObject<HTMLElement>
 }
 
 export function SlackMessage({
@@ -130,6 +131,7 @@ export function SlackMessage({
   attachment,
   isLoading,
   misoResult,
+  containerRef,
 }: SlackMessageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -140,6 +142,7 @@ export function SlackMessage({
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           result={misoResult}
+          containerRef={containerRef}
         />
       )}
     <div className="flex gap-2.5 px-5 py-2 hover:bg-[#F8F8F8] group">
@@ -198,8 +201,15 @@ export function SlackMessage({
               <MarkdownContent content={content} />
             </div>
           ) : (
-            content.split(/(@[\w\s]+(?:\([^)]+\))?|📘)/g).map((part, idx) => {
+            content.split(/(@[\w\s]+(?:\([^)]+\))?|\/[\w]+|📘)/g).map((part, idx) => {
               if (part.startsWith("@")) {
+                return (
+                  <span key={idx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
+                    {part}
+                  </span>
+                )
+              } else if (part.startsWith("/") && /^\/[\w]+$/.test(part)) {
+                // 슬래시 명령어를 멘션 스타일로 표시
                 return (
                   <span key={idx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
                     {part}

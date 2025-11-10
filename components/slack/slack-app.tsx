@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { SlackSidebar } from "@/components/slack-sidebar"
 import { SlackTopbar } from "@/components/slack-topbar"
 import { SlackInput } from "@/components/slack-input"
@@ -13,19 +13,16 @@ import { MOCK_MESSAGES, type Message } from "@/constants/messages"
 interface SlackAppProps {
   channelName?: string
   memberCount?: number
-  externalCount?: number
-  teamName?: string
   date?: string
 }
 
 export function SlackApp({
   channelName = "gs-holdings-52g-salesforce-slack",
   memberCount = 13,
-  externalCount = 9,
-  teamName = "Salesforce team",
   date = "11월 7일 금요일",
 }: SlackAppProps) {
   const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES)
+  const chatAreaRef = useRef<HTMLDivElement>(null)
 
   // 현재 시간 포맷팅 함수
   const getCurrentTime = useCallback(() => {
@@ -53,7 +50,7 @@ export function SlackApp({
           sender: "You",
           time: timeString,
           content: messageText,
-          avatar: "/placeholder-user.jpg",
+          avatar: "/assets/mini_kyle_default.png",
         }
 
         setMessages((prev) => [...prev, userMessage])
@@ -106,10 +103,13 @@ export function SlackApp({
 
         <ChannelTabs />
 
-        <div className="flex-1 relative min-h-0">
+        <div ref={chatAreaRef} className="flex-1 relative min-h-0">
           <DateSeparator date={date} />
 
-          <MessagesList messages={messages} externalCount={externalCount} teamName={teamName} />
+          <MessagesList 
+            messages={messages} 
+            containerRef={chatAreaRef}
+          />
         </div>
 
         <SlackInput onMessageSent={handleMessageSent} />

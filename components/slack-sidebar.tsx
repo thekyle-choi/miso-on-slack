@@ -162,11 +162,17 @@ export function SlackSidebar() {
         <div className="flex items-center justify-between">
           <button className="flex items-center gap-2 hover:bg-white/10 rounded px-2 py-1.5 flex-1">
             <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-blue-500"></div>
+              <Image
+                src="/assets/mini_kyle_default.png"
+                alt="User"
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-full object-cover"
+              />
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#4A154B]"></div>
             </div>
             <div className="flex flex-col items-start flex-1 min-w-0">
-              <span className="text-sm font-medium text-white truncate">User Name</span>
+              <span className="text-sm font-medium text-white truncate">Kyle Choi</span>
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span className="text-xs text-white/70">Active</span>

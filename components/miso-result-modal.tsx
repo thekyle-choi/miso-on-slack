@@ -1,13 +1,15 @@
 "use client"
 
-import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useMemo } from "react"
-import { X, ExternalLink } from "lucide-react"
+import { X } from "lucide-react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { cn } from "@/lib/utils"
 
 interface MisoResultModalProps {
   isOpen: boolean
   onClose: () => void
   result: string
+  containerRef?: React.RefObject<HTMLElement>
 }
 
 // 마크다운 콘텐츠 렌더링 함수
@@ -95,50 +97,58 @@ function renderMarkdown(content: string) {
   return result.join("")
 }
 
-export function MisoResultModal({ isOpen, onClose, result }: MisoResultModalProps) {
+export function MisoResultModal({ isOpen, onClose, result, containerRef }: MisoResultModalProps) {
   const renderedContent = useMemo(() => renderMarkdown(result), [result])
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl w-[90vw] h-[90vh] p-0 gap-0 overflow-hidden flex flex-col">
-        {/* Slack 스타일 헤더 */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 bg-[#611F69] rounded">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h2 className="text-lg font-bold text-gray-900">MISO 워크플로우 결과</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-              title="새 창에서 열기"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span>새 창에서 열기</span>
-            </button>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-              aria-label="닫기"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
+  if (!isOpen) return null
 
-        {/* 문서 내용 */}
-        <div className="flex-1 overflow-y-auto bg-white">
-          <div className="max-w-4xl mx-auto px-12 py-8">
-            <div className="prose prose-slate max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: renderedContent }} />
+  return (
+    <DialogPrimitive.Root open={isOpen} onOpenChange={onClose}>
+      <DialogPrimitive.Portal container={containerRef?.current || undefined}>
+        <DialogPrimitive.Overlay
+          className={cn(
+            "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 absolute inset-0 z-50 bg-black/50"
+          )}
+        />
+        <DialogPrimitive.Content
+          className={cn(
+            "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 absolute inset-0 z-50 bg-white flex flex-col overflow-hidden"
+          )}
+        >
+          {/* Slack 스타일 헤더 */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-8 h-8 bg-[#611F69] rounded">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <DialogPrimitive.Title className="text-lg font-bold text-gray-900">
+                MISO 워크플로우 결과
+              </DialogPrimitive.Title>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                aria-label="닫기"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+
+          {/* 문서 내용 */}
+          <div className="flex-1 overflow-y-auto bg-white">
+            <div className="max-w-4xl mx-auto px-12 py-8">
+              <div className="prose prose-slate max-w-none">
+                <div dangerouslySetInnerHTML={{ __html: renderedContent }} />
+              </div>
+            </div>
+          </div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   )
 }
 

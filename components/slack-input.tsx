@@ -276,19 +276,6 @@ export function SlackInput({ onMessageSent }: SlackInputProps) {
 
   return (
     <div className="border-t border-gray-200 bg-white">
-      {/* External Users Notice */}
-      <div className="px-5 py-3 bg-[#FDF6E3] border-b border-[#F5E6C8] flex items-center gap-2">
-        <div className="flex-shrink-0">
-          <svg className="w-5 h-5 text-[#1868DB]" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M7.5 2.25h9a5.25 5.25 0 110 10.5h-9a5.25 5.25 0 110-10.5z"/>
-            <path d="M7.5 21.75h9a5.25 5.25 0 100-10.5h-9a5.25 5.25 0 100 10.5z"/>
-          </svg>
-        </div>
-        <p className="text-sm text-gray-700">
-          <span className="font-semibold">9명의 외부 사용자</span>가 <span className="font-semibold">Salesforce 팀</span>에 속해 있습니다
-        </p>
-      </div>
-
       {/* Input Container */}
       <div className="px-5 py-4 relative">
         {/* Slash Command Dropdown */}
