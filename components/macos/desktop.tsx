@@ -14,11 +14,11 @@ export function MacDesktop({ children, onSlackClick, isSlackOpen }: DesktopProps
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* macOS 배경 - 고화질 이미지 */}
+      {/* macOS 배경 - Slack Miso 월페이퍼 */}
       <div 
         className="absolute inset-0"
         style={{
-          backgroundImage: 'url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=3840&auto=format&fit=crop")',
+          backgroundImage: 'url("/assets/slack_miso_wallpaper.png")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

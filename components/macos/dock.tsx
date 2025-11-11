@@ -86,6 +86,24 @@ export function MacDock({ onSlackClick, isSlackOpen }: DockProps) {
           </div>
         </button>
 
+        {/* Miso 앱 아이콘 */}
+        <button
+          className="group relative flex items-center justify-center w-14 h-14 rounded-xl hover:scale-110 transition-transform duration-200 shadow-lg overflow-hidden"
+        >
+          <div className="relative w-full h-full -m-1">
+            <Image
+              src="/icons/miso-icon.png"
+              alt="Miso"
+              fill
+              className="object-contain scale-110"
+            />
+          </div>
+          {/* 툴팁 */}
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Miso
+          </div>
+        </button>
+
         {/* 구분선 */}
         <div className="w-px h-12 bg-white/20 mx-1" />
 
