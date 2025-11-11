@@ -15,6 +15,10 @@ import Image from "next/image"
 interface DockProps {
   onSlackClick?: () => void
   isSlackOpen?: boolean
+  onChromeClick?: () => void
+  onMisoClick?: () => void
+  onFinderClick?: () => void
+  onPhotosClick?: () => void
 }
 
 type DockApp = {
@@ -46,7 +50,7 @@ function DockIcon({ app }: { app: DockApp }) {
   )
 }
 
-export function MacDock({ onSlackClick, isSlackOpen }: DockProps) {
+export function MacDock({ onSlackClick, isSlackOpen, onChromeClick, onMisoClick, onFinderClick, onPhotosClick }: DockProps) {
   const dockApps: DockApp[] = [
     { iconPath: "/icons/chrome-icon.png", icon: Chrome, label: "Chrome", color: "bg-red-500" },
     { iconPath: "/icons/finder-icon.png", icon: Folder, label: "Finder", color: "bg-blue-500" },
@@ -88,6 +92,10 @@ export function MacDock({ onSlackClick, isSlackOpen }: DockProps) {
 
         {/* Miso 앱 아이콘 */}
         <button
+          onClick={() => {
+            console.log("Dock Miso button clicked!")
+            onMisoClick?.()
+          }}
           className="group relative flex items-center justify-center w-14 h-14 rounded-xl hover:scale-110 transition-transform duration-200 shadow-lg overflow-hidden"
         >
           <div className="relative w-full h-full -m-1">
@@ -108,18 +116,32 @@ export function MacDock({ onSlackClick, isSlackOpen }: DockProps) {
         <div className="w-px h-12 bg-white/20 mx-1" />
 
         {/* 다른 앱들 */}
-        {dockApps.map((app, index) => (
-          <button
-            key={index}
-            className="group relative flex items-center justify-center w-14 h-14 rounded-xl hover:scale-110 transition-transform duration-200 shadow-lg overflow-hidden"
-          >
-            <DockIcon app={app} />
-            {/* 툴팁 */}
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-              {app.label}
-            </div>
-          </button>
-        ))}
+        {dockApps.map((app, index) => {
+          const handleClick = () => {
+            if (app.label === "Chrome" && onChromeClick) {
+              onChromeClick()
+            } else if (app.label === "Finder" && onFinderClick) {
+              onFinderClick()
+            } else if (app.label === "Photos" && onPhotosClick) {
+              onPhotosClick()
+            }
+            // 다른 앱들의 클릭 핸들러는 필요시 추가 가능
+          }
+
+          return (
+            <button
+              key={index}
+              onClick={handleClick}
+              className="group relative flex items-center justify-center w-14 h-14 rounded-xl hover:scale-110 transition-transform duration-200 shadow-lg overflow-hidden"
+            >
+              <DockIcon app={app} />
+              {/* 툴팁 */}
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                {app.label}
+              </div>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

@@ -73,7 +73,7 @@ export function SlackCommandDropdown({
               }`}
             >
               {/* 아이콘 */}
-              <div className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded bg-white">
+              <div className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded bg-white overflow-hidden">
                 {command.icon === "slack" ? (
                   <svg className="w-5 h-5" viewBox="0 0 54 54" fill="none">
                     <path d="M11.3 24.3c0 2.6-2.1 4.6-4.6 4.6S2 26.9 2 24.3s2.1-4.6 4.6-4.6h4.6v4.6zm2.3 0c0-2.6 2.1-4.6 4.6-4.6s4.6 2.1 4.6 4.6v11.5c0 2.6-2.1 4.6-4.6 4.6s-4.6-2.1-4.6-4.6V24.3z" fill="#E01E5A"/>
@@ -81,8 +81,8 @@ export function SlackCommandDropdown({
                     <path d="M42.7 18.2c0-2.6 2.1-4.6 4.6-4.6s4.6 2.1 4.6 4.6-2.1 4.6-4.6 4.6h-4.6v-4.6zm-2.3 0c0 2.6-2.1 4.6-4.6 4.6s-4.6-2.1-4.6-4.6V6.7c0-2.6 2.1-4.6 4.6-4.6s4.6 2.1 4.6 4.6v11.5z" fill="#2EB67D"/>
                     <path d="M35.8 42.7c2.6 0 4.6 2.1 4.6 4.6s-2.1 4.6-4.6 4.6-4.6-2.1-4.6-4.6v-4.6h4.6zm0-2.3c-2.6 0-4.6-2.1-4.6-4.6s2.1-4.6 4.6-4.6h11.5c2.6 0 4.6 2.1 4.6 4.6s-2.1 4.6-4.6 4.6H35.8z" fill="#ECB22E"/>
                   </svg>
-                ) : command.icon.startsWith("http") ? (
-                  <img src={command.icon} alt="" className="w-6 h-6" />
+                ) : command.icon.startsWith("http") || command.icon.startsWith("/") ? (
+                  <img src={command.icon} alt="" className="w-full h-full object-cover rounded" />
                 ) : (
                   <span className="text-xl">{command.icon}</span>
                 )}

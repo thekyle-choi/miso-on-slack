@@ -7,9 +7,13 @@ interface DesktopProps {
   children?: React.ReactNode
   onSlackClick?: () => void
   isSlackOpen?: boolean
+  onChromeClick?: () => void
+  onMisoClick?: () => void
+  onFinderClick?: () => void
+  onPhotosClick?: () => void
 }
 
-export function MacDesktop({ children, onSlackClick, isSlackOpen }: DesktopProps) {
+export function MacDesktop({ children, onSlackClick, isSlackOpen, onChromeClick, onMisoClick, onFinderClick, onPhotosClick }: DesktopProps) {
   const activeApp = isSlackOpen ? "slack" : "finder"
 
   return (
@@ -34,7 +38,14 @@ export function MacDesktop({ children, onSlackClick, isSlackOpen }: DesktopProps
       </div>
       
       {/* Dock */}
-      <MacDock onSlackClick={onSlackClick} isSlackOpen={isSlackOpen} />
+      <MacDock 
+        onSlackClick={onSlackClick} 
+        isSlackOpen={isSlackOpen} 
+        onChromeClick={onChromeClick}
+        onMisoClick={onMisoClick}
+        onFinderClick={onFinderClick}
+        onPhotosClick={onPhotosClick}
+      />
     </div>
   )
 }

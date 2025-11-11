@@ -12,6 +12,7 @@ interface Tab {
 interface ChannelTabsProps {
   tabs?: Tab[]
   onTabClick?: (tabId: string) => void
+  currentChannel?: string
 }
 
 const DEFAULT_TABS: Tab[] = [
@@ -38,10 +39,24 @@ const DEFAULT_TABS: Tab[] = [
   },
 ]
 
-export function ChannelTabs({ tabs = DEFAULT_TABS, onTabClick }: ChannelTabsProps) {
+// TBM 채널용 탭 (메시지만 표시)
+const TBM_TABS: Tab[] = [
+  {
+    id: "messages",
+    label: "메시지",
+    icon: <MessageCircle className="w-4 h-4" />,
+    isActive: true,
+  },
+]
+
+export function ChannelTabs({ tabs, onTabClick, currentChannel }: ChannelTabsProps) {
+  // 채널별 탭 결정
+  // "일반" 채널과 "gs-52g-powerplant-tbm", "gs-52g-design-group" 채널은 메시지 탭만 표시
+  const displayTabs = tabs || (currentChannel === "일반" || currentChannel === "gs-52g-powerplant-tbm" || currentChannel === "gs-52g-design-group" ? TBM_TABS : DEFAULT_TABS)
+
   return (
     <div className="flex items-center gap-0 px-4 py-0 border-b border-gray-200 bg-white">
-      {tabs.map((tab) => (
+      {displayTabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabClick?.(tab.id)}

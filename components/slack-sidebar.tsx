@@ -2,7 +2,12 @@
 
 import { ChevronDown, Hash, Star, Edit2, MessageSquare, MoreHorizontal, Users, Smile, Headphones } from "lucide-react"
 
-export function SlackSidebar() {
+interface SlackSidebarProps {
+  currentChannel?: string
+  onChannelChange?: (channel: string) => void
+}
+
+export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarProps) {
   return (
     <div className="w-[260px] h-full bg-[#4A154B] text-white flex flex-col border-r border-[#350D36]">
       {/* Workspace Header */}
@@ -58,17 +63,31 @@ export function SlackSidebar() {
             <span className="text-white/80 font-semibold">외부 연결</span>
           </button>
           <div className="space-y-0.5 mt-1">
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
+            <button 
+              onClick={() => onChannelChange?.("gs-52g-powerplant-tbm")}
+              className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
+                currentChannel === "gs-52g-powerplant-tbm"
+                  ? "bg-[#1164A3] hover:bg-[#0D4F85] text-white"
+                  : "hover:bg-white/10 text-white/70 hover:text-white"
+              }`}
+            >
               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth={2} />
               </svg>
-              <span className="truncate">gs-graphon</span>
+              <span className="truncate">gs-52g-powerplant-tbm</span>
             </button>
-            <button className="flex items-center gap-2 px-2 py-1 bg-[#1164A3] hover:bg-[#0D4F85] rounded w-full text-sm text-white transition-colors">
+            <button 
+              onClick={() => onChannelChange?.("gs-52g-design-group")}
+              className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
+                currentChannel === "gs-52g-design-group"
+                  ? "bg-[#1164A3] hover:bg-[#0D4F85] text-white"
+                  : "hover:bg-white/10 text-white/70 hover:text-white"
+              }`}
+            >
               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth={2} />
               </svg>
-              <span className="truncate">gs-holdings-52g-salesforce-sla...</span>
+              <span className="truncate">gs-52g-design-group</span>
             </button>
           </div>
         </div>
@@ -80,6 +99,17 @@ export function SlackSidebar() {
             <span className="text-white/80 font-semibold">채널</span>
           </button>
           <div className="space-y-0.5 mt-1">
+            <button 
+              onClick={() => onChannelChange?.("일반")}
+              className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
+                currentChannel === "일반"
+                  ? "bg-[#1164A3] hover:bg-[#0D4F85] text-white"
+                  : "hover:bg-white/10 text-white/70 hover:text-white"
+              }`}
+            >
+              <Hash className="w-4 h-4 shrink-0" />
+              <span>일반</span>
+            </button>
             <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
               <Hash className="w-4 h-4 shrink-0" />
               <span>52g</span>
@@ -93,10 +123,6 @@ export function SlackSidebar() {
                 <path d="M7 8h10M7 12h10m-7 4h7" strokeWidth={2} strokeLinecap="round" />
               </svg>
               <span>미소-중요정보</span>
-            </button>
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <Hash className="w-4 h-4 shrink-0" />
-              <span>일반</span>
             </button>
           </div>
         </div>

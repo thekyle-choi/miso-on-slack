@@ -201,26 +201,69 @@ export function SlackMessage({
               <MarkdownContent content={content} />
             </div>
           ) : (
-            content.split(/(@[\w\s]+(?:\([^)]+\))?|\/[\w]+|📘)/g).map((part, idx) => {
-              if (part.startsWith("@")) {
+            (() => {
+              // 멘션 패턴: @이름(역할) 또는 @이름 형식 (한글, 영문, 숫자 포함)
+              const mentionPattern = /(@[가-힣\w]+(?:\([가-힣\w]+\))?)/g
+              const parts: Array<{ text: string; isMention: boolean }> = []
+              let lastIndex = 0
+              let match
+
+              while ((match = mentionPattern.exec(content)) !== null) {
+                // 멘션 이전의 일반 텍스트
+                if (match.index > lastIndex) {
+                  parts.push({ text: content.slice(lastIndex, match.index), isMention: false })
+                }
+                // 멘션
+                parts.push({ text: match[0], isMention: true })
+                lastIndex = mentionPattern.lastIndex
+              }
+
+              // 마지막 멘션 이후의 일반 텍스트
+              if (lastIndex < content.length) {
+                parts.push({ text: content.slice(lastIndex), isMention: false })
+              }
+
+              // 빈 문자열이 아닌 경우에만 처리
+              if (parts.length === 0) {
+                parts.push({ text: content, isMention: false })
+              }
+
+              return parts.map((part, idx) => {
+                if (part.isMention) {
                 return (
                   <span key={idx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
-                    {part}
+                      {part.text}
                   </span>
                 )
-              } else if (part.startsWith("/") && /^\/[\w]+$/.test(part)) {
-                // 슬래시 명령어를 멘션 스타일로 표시
+                } else {
+                  // 일반 텍스트 내에서 볼드, 슬래시 명령어, 이모지 처리
+                  return (
+                    <span key={idx}>
+                      {part.text.split(/(\*\*[^*]+\*\*|\/[\w]+|📘)/g).map((subPart, subIdx) => {
+                        // 볼드 마크다운 처리: **텍스트**
+                        if (subPart.startsWith("**") && subPart.endsWith("**") && subPart.length > 4) {
+                          const boldText = subPart.slice(2, -2)
+                          return (
+                            <strong key={subIdx} className="font-semibold">
+                              {boldText}
+                            </strong>
+                          )
+                        }
+                        // 슬래시 명령어 처리
+                        if (subPart.startsWith("/") && /^\/[\w]+$/.test(subPart)) {
                 return (
-                  <span key={idx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
-                    {part}
+                            <span key={subIdx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
+                              {subPart}
+                            </span>
+                          )
+                        }
+                        return <span key={subIdx}>{subPart}</span>
+                      })}
                   </span>
                 )
-              } else if (part === "📘") {
-                return <span key={idx}>{part}</span>
-              } else {
-                return <span key={idx}>{part}</span>
               }
             })
+            })()
           )}
         </div>
 
