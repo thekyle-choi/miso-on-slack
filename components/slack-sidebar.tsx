@@ -47,12 +47,41 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
 
         {/* Favorites Section */}
         <div className="mb-5">
-          <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm mb-1 transition-colors">
-            <Star className="w-4 h-4 shrink-0" />
+          <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm mb-0.5 transition-colors">
+            <ChevronDown className="w-4 h-4 shrink-0" />
             <span className="text-white/80 font-semibold">즐겨찾기</span>
           </button>
-          <div className="text-xs text-white/50 px-2 py-1.5 leading-relaxed">
-            자주 사용하는 채널과 메시지를 쉽게 찾을 수 있도록 추가하세요
+          <div className="space-y-0.5 mt-1">
+            <button 
+              onClick={() => onChannelChange?.("anjenbot-safety-bot")}
+              className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
+                currentChannel === "anjenbot-safety-bot"
+                  ? "bg-white hover:bg-gray-100 text-gray-900"
+                  : "hover:bg-white/10 text-white/70 hover:text-white"
+              }`}
+            >
+              <Star className={`w-4 h-4 shrink-0 ${
+                currentChannel === "anjenbot-safety-bot"
+                  ? "fill-yellow-500 text-yellow-500"
+                  : "fill-yellow-400 text-yellow-400"
+              }`} />
+              <span className="truncate">AnGenBot(Safety Bot)</span>
+            </button>
+            <button 
+              onClick={() => onChannelChange?.("plai-maker")}
+              className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
+                currentChannel === "plai-maker"
+                  ? "bg-white hover:bg-gray-100 text-gray-900"
+                  : "hover:bg-white/10 text-white/70 hover:text-white"
+              }`}
+            >
+              <Star className={`w-4 h-4 shrink-0 ${
+                currentChannel === "plai-maker"
+                  ? "fill-yellow-500 text-yellow-500"
+                  : "fill-yellow-400 text-yellow-400"
+              }`} />
+              <span className="truncate">PLAI MAKER</span>
+            </button>
           </div>
         </div>
 
@@ -67,7 +96,7 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
               onClick={() => onChannelChange?.("gs-52g-powerplant-tbm")}
               className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
                 currentChannel === "gs-52g-powerplant-tbm"
-                  ? "bg-[#1164A3] hover:bg-[#0D4F85] text-white"
+                  ? "bg-white hover:bg-gray-100 text-gray-900"
                   : "hover:bg-white/10 text-white/70 hover:text-white"
               }`}
             >
@@ -80,7 +109,7 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
               onClick={() => onChannelChange?.("gs-52g-design-group")}
               className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
                 currentChannel === "gs-52g-design-group"
-                  ? "bg-[#1164A3] hover:bg-[#0D4F85] text-white"
+                  ? "bg-white hover:bg-gray-100 text-gray-900"
                   : "hover:bg-white/10 text-white/70 hover:text-white"
               }`}
             >
@@ -103,7 +132,7 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
               onClick={() => onChannelChange?.("일반")}
               className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
                 currentChannel === "일반"
-                  ? "bg-[#1164A3] hover:bg-[#0D4F85] text-white"
+                  ? "bg-white hover:bg-gray-100 text-gray-900"
                   : "hover:bg-white/10 text-white/70 hover:text-white"
               }`}
             >
@@ -113,16 +142,6 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
             <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
               <Hash className="w-4 h-4 shrink-0" />
               <span>52g</span>
-            </button>
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <Hash className="w-4 h-4 shrink-0" />
-              <span>랜덤</span>
-            </button>
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M7 8h10M7 12h10m-7 4h7" strokeWidth={2} strokeLinecap="round" />
-              </svg>
-              <span>미소-중요정보</span>
             </button>
           </div>
         </div>
@@ -135,51 +154,59 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
           </button>
           <div className="space-y-0.5 mt-1">
             <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <div className="w-5 h-5 rounded-sm bg-purple-400 shrink-0 relative">
-                <div className="w-1.5 h-1.5 bg-white rounded-full absolute -bottom-0.5 -right-0.5 border border-[#4A154B]"></div>
+              <div className="relative shrink-0">
+                <img 
+                  src="/assets/avatar_ally.jpg" 
+                  alt="Ally" 
+                  className="w-5 h-5 rounded-sm object-cover"
+                />
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full absolute -bottom-0.5 -right-0.5 border-2 border-[#4A154B]"></div>
               </div>
-              <span className="truncate">Zoey(이수민)</span>
-            </button>
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <div className="w-5 h-5 rounded-sm bg-green-400 shrink-0"></div>
-              <span className="truncate">Heather</span>
+              <span className="truncate">Ally</span>
             </button>
             <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
               <div className="relative shrink-0">
-                <div className="w-5 h-5 rounded-sm bg-pink-400"></div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-[#4A154B]"></div>
+                <img 
+                  src="/assets/avatar_zoey.jpg" 
+                  alt="Zoey" 
+                  className="w-5 h-5 rounded-sm object-cover"
+                />
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full absolute -bottom-0.5 -right-0.5 border-2 border-[#4A154B]"></div>
               </div>
-              <span className="truncate">Julie 박주리</span>
+              <span className="truncate">Zoey</span>
             </button>
             <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <div className="w-5 h-5 rounded-sm bg-blue-400 shrink-0 relative">
-                <div className="w-1.5 h-1.5 bg-white rounded-full absolute -bottom-0.5 -right-0.5 border border-[#4A154B]"></div>
+              <div className="relative shrink-0">
+                <img 
+                  src="/assets/avatar_young.jpg" 
+                  alt="Young" 
+                  className="w-5 h-5 rounded-sm object-cover"
+                />
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full absolute -bottom-0.5 -right-0.5 border-2 border-[#4A154B]"></div>
               </div>
-              <span className="truncate">Ally 김진아 52g</span>
+              <span className="truncate">Young</span>
             </button>
             <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <div className="w-5 h-5 rounded-sm bg-yellow-400 shrink-0"></div>
-              <span className="truncate">keaton</span>
-            </button>
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <div className="w-5 h-5 rounded-sm bg-red-400 shrink-0 relative">
-                <div className="w-1.5 h-1.5 bg-white rounded-full absolute -bottom-0.5 -right-0.5 border border-[#4A154B]"></div>
+              <div className="relative shrink-0">
+                <img 
+                  src="/assets/avatar_leo.jpg" 
+                  alt="Leo" 
+                  className="w-5 h-5 rounded-sm object-cover"
+                />
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full absolute -bottom-0.5 -right-0.5 border-2 border-[#4A154B]"></div>
               </div>
-              <span className="truncate">Jin(이진수)</span>
+              <span className="truncate">Leo</span>
             </button>
             <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <div className="w-5 h-5 rounded-sm bg-indigo-400 shrink-0"></div>
-              <span className="truncate">Bob(박종협)</span>
-            </button>
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <div className="w-5 h-5 rounded-sm bg-orange-400 shrink-0"></div>
-              <span className="truncate">Ronny(장성욱)</span>
-            </button>
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
-              <div className="w-5 h-5 rounded-sm bg-teal-400 shrink-0 relative">
-                <div className="w-1.5 h-1.5 bg-white rounded-full absolute -bottom-0.5 -right-0.5 border border-[#4A154B]"></div>
+              <div className="relative shrink-0">
+                <img 
+                  src="/assets/avatar_ian.jpg" 
+                  alt="Ian" 
+                  className="w-5 h-5 rounded-sm object-cover"
+                />
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full absolute -bottom-0.5 -right-0.5 border-2 border-[#4A154B]"></div>
               </div>
-              <span className="truncate">BOM(박은아)</span>
+              <span className="truncate">Ian</span>
             </button>
           </div>
         </div>

@@ -10,7 +10,7 @@ interface ChannelWelcomeProps {
 export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeProps) {
   return (
     <div className="flex flex-col h-full px-8 py-12">
-      <div className="max-w-2xl w-full">
+      <div className="w-full">
         {/* 환영 제목 */}
         <h1 className="text-3xl font-bold text-gray-900 mb-2 text-left">
           #MISO on Slack
@@ -20,9 +20,12 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
         </p>
 
         {/* 카드들 */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-4 gap-6">
           {/* PLAI MAKER */}
-          <div className="bg-[#E0F5F5] rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full">
+          <div 
+            onClick={() => onChannelChange?.("plai-maker")}
+            className="bg-cyan-50 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full min-h-[280px]"
+          >
             <div className="mb-4">
               <div className="text-sm font-semibold text-gray-900 mb-1">
                 PLAI MAKER
@@ -40,36 +43,58 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
             </div>
           </div>
 
-          {/* 안전 작업 TBM */}
+          {/* 안젠봇 (Safety Bot) */}
           <div 
-            onClick={() => onChannelChange?.("gs-52g-powerplant-tbm")}
-            className="bg-[#FFE8D1] rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full"
+            onClick={() => onChannelChange?.("anjenbot-safety-bot")}
+            className="bg-green-50 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full min-h-[280px]"
           >
             <div className="mb-4">
               <div className="text-sm font-semibold text-gray-900 mb-1">
-                안전 작업 TBM
+                안젠봇 (Safety Bot)
               </div>
               <div className="text-xs text-gray-600">
-                작업기반방법 문서 생성
+                안전 관리 AI 어시스턴트
               </div>
             </div>
-            <div className="mt-auto flex justify-center">
+            <div className="mt-auto flex justify-center overflow-hidden h-36">
               <img 
-                src="/assets/tbm.png" 
-                alt="안전 작업 TBM" 
-                className="h-40 w-full max-w-[200px] object-contain object-bottom"
+                src="/assets/anGenbot.png" 
+                alt="안젠봇" 
+                className="w-full max-w-[200px] h-full object-cover object-top"
               />
             </div>
           </div>
 
-          {/* 디자인 리스크 체크 에이전트 */}
+          {/* 에너지 뉴스 클리핑 */}
           <div 
-            onClick={() => onChannelChange?.("gs-52g-design-group")}
-            className="bg-[#F4E4FF] rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full"
+            onClick={() => onChannelChange?.("gs-52g-powerplant-tbm")}
+            className="bg-orange-50 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full min-h-[280px]"
           >
             <div className="mb-4">
               <div className="text-sm font-semibold text-gray-900 mb-1">
-                디자인 리스크 체크 에이전트
+                에너지 뉴스 클리핑
+              </div>
+              <div className="text-xs text-gray-600">
+                에너지 관련 뉴스 수집 및 요약
+              </div>
+            </div>
+            <div className="mt-auto flex justify-center overflow-hidden h-36">
+              <img 
+                src="/assets/energynews.png" 
+                alt="에너지 뉴스 클리핑" 
+                className="w-full max-w-[200px] h-full object-cover object-top"
+              />
+            </div>
+          </div>
+
+          {/* 디자인 리스크 체크 */}
+          <div 
+            onClick={() => onChannelChange?.("gs-52g-design-group")}
+            className="bg-purple-50 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full min-h-[280px]"
+          >
+            <div className="mb-4">
+              <div className="text-sm font-semibold text-gray-900 mb-1">
+                디자인 리스크 체크
               </div>
               <div className="text-xs text-gray-600">
                 디자인 시안 리스크 점검
@@ -78,7 +103,7 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
             <div className="mt-auto flex justify-center">
               <img 
                 src="/assets/design-risk.png" 
-                alt="디자인 리스크 체크 에이전트" 
+                alt="디자인 리스크 체크" 
                 className="h-40 w-full max-w-[200px] object-contain object-bottom"
               />
             </div>

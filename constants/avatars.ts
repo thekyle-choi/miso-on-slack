@@ -17,6 +17,13 @@ export const AVATARS: Record<string, string> = {
   "Michael Kim(Team Lead)": "/assets/avatar_kim_minsu.jpg",
   "Daniel Lee(Design QA)": "/assets/avatar_lee_hyunwoo.jpg",
   
+  // 다이렉트 메시지 인물들
+  "Ally": "/assets/avatar_ally.jpg",
+  "Zoey": "/assets/avatar_zoey.jpg",
+  "Young": "/assets/avatar_young.jpg",
+  "Leo": "/assets/avatar_leo.jpg",
+  "Ian": "/assets/avatar_ian.jpg",
+  
   // 기본 채널 인물들
   "Leo(Heo Youngsu)": "/assets/mini_kyle_default.jpg",
   "Sungeun Im": "/assets/mini_ally_default.jpg",

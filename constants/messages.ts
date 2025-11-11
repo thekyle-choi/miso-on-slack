@@ -212,8 +212,47 @@ export const DESIGN_GROUP_MOCK_MESSAGES: Message[] = [
   },
 ]
 
+// HR Policy Agent 관련 목업 메시지
+export const HR_POLICY_MOCK_MESSAGES: Message[] = [
+  {
+    sender: "HR Policy Agent",
+    time: "AM 9:00",
+    content:
+      "Hello! I'm the HR Policy Agent. I can help you with questions about company policies, employee benefits, leave policies, and HR procedures.\n\nHow can I assist you today?",
+    avatar: "/assets/mini_kyle_default.jpg",
+    isBot: true,
+  },
+]
+
+// 안젠봇(Safety Bot) 관련 목업 메시지
+export const ANJENBOT_SAFETY_MOCK_MESSAGES: Message[] = [
+  {
+    sender: "AnGenBot(Safety Bot)",
+    time: "AM 9:00",
+    content:
+      "Hello! I'm AnGenBot, your Safety Bot. I can help you with safety protocols, risk assessments, TBM (Task-Based Method) document generation, and workplace safety procedures.\n\nHow can I assist you with safety-related tasks today?",
+    avatar: "/assets/anjenbot_avatar.png",
+    isBot: true,
+  },
+]
+
+// PLAI MAKER 관련 목업 메시지
+export const PLAI_MAKER_MOCK_MESSAGES: Message[] = [
+  {
+    sender: "PLAI MAKER",
+    time: "AM 9:00",
+    content:
+      "Hello! We are team PLAI MAKER. I can help you transform your ideas into concrete app prototypes and assist with app generation.\n\nHow can I help you bring your ideas to life today?",
+    avatar: "/assets/plai-maker-main.png",
+    isBot: true,
+  },
+]
+
 // 일반 채널 빈 메시지 (초기 환영 화면)
 export const GENERAL_CHANNEL_MESSAGES: Message[] = []
+
+// 빈 채팅창용 메시지
+export const EMPTY_CHANNEL_MESSAGES: Message[] = []
 
 // 채널별 목업 메시지 맵
 export const CHANNEL_MOCK_MESSAGES: Record<string, Message[]> = {
@@ -222,5 +261,8 @@ export const CHANNEL_MOCK_MESSAGES: Record<string, Message[]> = {
   "gs-graphon": MOCK_MESSAGES,
   "gs-52g-powerplant-tbm": POWERPLANT_MOCK_MESSAGES,
   "gs-52g-design-group": DESIGN_GROUP_MOCK_MESSAGES,
+  "anjenbot-safety-bot": ANJENBOT_SAFETY_MOCK_MESSAGES,
+  "hr-policy-agent": HR_POLICY_MOCK_MESSAGES,
+  "plai-maker": PLAI_MAKER_MOCK_MESSAGES,
 }
 

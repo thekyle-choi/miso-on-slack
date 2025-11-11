@@ -7,7 +7,6 @@ import { SlackTopbar } from "@/components/slack-topbar"
 import { SlackInput } from "@/components/slack-input"
 import { ChannelHeader } from "./channel-header"
 import { ChannelTabs } from "./channel-tabs"
-import { DateSeparator } from "./date-separator"
 import { MessagesList } from "./messages-list"
 import { ChannelWelcome } from "@/components/channel-welcome"
 import { MOCK_MESSAGES, CHANNEL_MOCK_MESSAGES, type Message } from "@/constants/messages"
@@ -49,6 +48,18 @@ const CHANNELS: Record<string, ChannelInfo> = {
     name: "gs-52g-design-group",
     memberCount: 6,
   },
+  "anjenbot-safety-bot": {
+    name: "AnGenBot(Safety Bot)",
+    memberCount: 1,
+  },
+  "hr-policy-agent": {
+    name: "HR Policy Agent",
+    memberCount: 1,
+  },
+  "plai-maker": {
+    name: "PLAI MAKER",
+    memberCount: 1,
+  },
 }
 
 const STORAGE_KEY_PREFIX = "slack-messages-"
@@ -72,6 +83,12 @@ export function SlackApp({
     if (typeof window === "undefined") {
       // 채널별 기본 목업 메시지 반환
       return CHANNEL_MOCK_MESSAGES[channel] || MOCK_MESSAGES
+    }
+    
+    // HR Policy Agent와 같은 특정 채널은 항상 기본 목업 메시지만 사용
+    const alwaysUseMockChannels = ["hr-policy-agent", "anjenbot-safety-bot", "plai-maker"]
+    if (alwaysUseMockChannels.includes(channel)) {
+      return CHANNEL_MOCK_MESSAGES[channel] || []
     }
     
     try {
@@ -168,6 +185,12 @@ export function SlackApp({
   // 메시지가 변경될 때마다 sessionStorage에 저장 (채널별)
   useEffect(() => {
     if (typeof window === "undefined") return
+    
+    // HR Policy Agent와 같은 특정 채널은 메시지를 저장하지 않음
+    const alwaysUseMockChannels = ["hr-policy-agent", "anjenbot-safety-bot", "plai-maker"]
+    if (alwaysUseMockChannels.includes(currentChannel)) {
+      return
+    }
     
     try {
       // 채널별 기본 목업 메시지를 제외한 사용자 메시지만 저장
@@ -287,16 +310,13 @@ export function SlackApp({
           <ChannelTabs currentChannel={currentChannel} />
 
           <div ref={chatAreaRef} className="flex-1 relative min-h-0">
-            {messages.length === 0 ? (
+            {messages.length === 0 && currentChannel === "일반" ? (
               <ChannelWelcome channelName={channelName} onChannelChange={handleChannelChange} />
             ) : (
-              <>
-            <DateSeparator date={date} />
             <MessagesList 
               messages={messages} 
               containerRef={chatAreaRef}
             />
-              </>
             )}
           </div>
 
