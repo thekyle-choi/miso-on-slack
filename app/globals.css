@@ -161,4 +161,71 @@
   .animate-macos-loading {
     animation: macos-loading 1.5s ease-in-out;
   }
+
+  /* Custom scrollbar that appears on hover */
+  .scrollbar-hover {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
+  .scrollbar-hover:hover {
+    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  .scrollbar-hover::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-hover::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-hover::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+
+  .scrollbar-hover:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
+  .scrollbar-hover::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  /* Dark scrollbar for sidebar */
+  .scrollbar-hover-dark {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
+  .scrollbar-hover-dark:hover {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  .scrollbar-hover-dark::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-hover-dark::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-hover-dark::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+
+  .scrollbar-hover-dark:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .scrollbar-hover-dark::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
 }

@@ -20,6 +20,16 @@ export default function Home() {
     setIsSlackOpen(false)
   }
 
+  const handleSlackMinimize = () => {
+    console.log("Minimizing Slack window...")
+    setIsSlackOpen(false)
+  }
+
+  const handleSlackMaximize = () => {
+    console.log("Maximizing Slack window...")
+    // 최대화 기능은 나중에 구현 가능
+  }
+
   const handleBootComplete = () => {
     setIsBooting(false)
   }
@@ -34,10 +44,14 @@ export default function Home() {
           title="Slack"
           isOpen={isSlackOpen}
           onClose={handleSlackClose}
-          defaultWidth={1200}
+          defaultWidth={1268}
           defaultHeight={800}
         >
-          <SlackApp />
+          <SlackApp 
+            onClose={handleSlackClose}
+            onMinimize={handleSlackMinimize}
+            onMaximize={handleSlackMaximize}
+          />
         </MacAppWindow>
       </MacDesktop>
       

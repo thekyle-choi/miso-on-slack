@@ -20,7 +20,7 @@ export function MessagesList({
   }, [messages])
 
   return (
-    <div className="absolute inset-0 overflow-y-auto bg-white">
+    <div className="absolute inset-0 overflow-y-auto bg-white scrollbar-hover">
       {messages.map((message, idx) => (
         <SlackMessage
           key={idx}

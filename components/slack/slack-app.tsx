@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef } from "react"
+import { WorkspaceSwitcher } from "@/components/workspace-switcher"
 import { SlackSidebar } from "@/components/slack-sidebar"
 import { SlackTopbar } from "@/components/slack-topbar"
 import { SlackInput } from "@/components/slack-input"
@@ -14,12 +15,18 @@ interface SlackAppProps {
   channelName?: string
   memberCount?: number
   date?: string
+  onClose?: () => void
+  onMinimize?: () => void
+  onMaximize?: () => void
 }
 
 export function SlackApp({
   channelName = "gs-holdings-52g-salesforce-slack",
   memberCount = 13,
   date = "11월 7일 금요일",
+  onClose,
+  onMinimize,
+  onMaximize,
 }: SlackAppProps) {
   const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES)
   const chatAreaRef = useRef<HTMLDivElement>(null)
@@ -93,26 +100,30 @@ export function SlackApp({
   )
 
   return (
-    <div className="flex h-full bg-white overflow-hidden">
-      <SlackSidebar />
+    <div className="flex flex-col h-full bg-white overflow-hidden">
+      {/* 상단바가 전체 너비로 확장 */}
+      <SlackTopbar onClose={onClose} onMinimize={onMinimize} onMaximize={onMaximize} />
+      
+      <div className="flex flex-1 min-h-0">
+        <WorkspaceSwitcher />
+        <SlackSidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        <SlackTopbar />
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          <ChannelHeader channelName={channelName} memberCount={memberCount} />
 
-        <ChannelHeader channelName={channelName} memberCount={memberCount} />
+          <ChannelTabs />
 
-        <ChannelTabs />
+          <div ref={chatAreaRef} className="flex-1 relative min-h-0">
+            <DateSeparator date={date} />
 
-        <div ref={chatAreaRef} className="flex-1 relative min-h-0">
-          <DateSeparator date={date} />
+            <MessagesList 
+              messages={messages} 
+              containerRef={chatAreaRef}
+            />
+          </div>
 
-          <MessagesList 
-            messages={messages} 
-            containerRef={chatAreaRef}
-          />
+          <SlackInput onMessageSent={handleMessageSent} />
         </div>
-
-        <SlackInput onMessageSent={handleMessageSent} />
       </div>
     </div>
   )
