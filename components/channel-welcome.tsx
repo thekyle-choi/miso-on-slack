@@ -16,7 +16,7 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
           #MISO on Slack
         </h1>
         <p className="text-gray-600 mb-8 text-left">
-          아래의 버튼을 클릭하여 miso가 연동된 usecase를 확인해보세요!
+          Click the buttons below to explore use cases integrated with MISO!
         </p>
 
         {/* 카드들 */}
@@ -31,7 +31,7 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
                 PLAI MAKER
               </div>
               <div className="text-xs text-gray-600">
-                아이디어 구체화 및 앱생성
+                App creation assistant agent
               </div>
             </div>
             <div className="mt-auto flex justify-center">
@@ -50,16 +50,16 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
           >
             <div className="mb-4">
               <div className="text-sm font-semibold text-gray-900 mb-1">
-                안젠봇 (Safety Bot)
+                AnGenBot (Safety Bot)
               </div>
               <div className="text-xs text-gray-600">
-                안전 관리 AI 어시스턴트
+                Safety regulation agent
               </div>
             </div>
             <div className="mt-auto flex justify-center overflow-hidden h-36">
               <img 
                 src="/assets/anGenbot.png" 
-                alt="안젠봇" 
+                alt="AnGenBot" 
                 className="w-full max-w-[200px] h-full object-cover object-top"
               />
             </div>
@@ -72,16 +72,16 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
           >
             <div className="mb-4">
               <div className="text-sm font-semibold text-gray-900 mb-1">
-                에너지 뉴스 클리핑
+                Energy News Clipping
               </div>
               <div className="text-xs text-gray-600">
-                에너지 관련 뉴스 수집 및 요약
+                News collection agent
               </div>
             </div>
             <div className="mt-auto flex justify-center overflow-hidden h-36">
               <img 
                 src="/assets/energynews.png" 
-                alt="에너지 뉴스 클리핑" 
+                alt="Energy News Clipping" 
                 className="w-full max-w-[200px] h-full object-cover object-top"
               />
             </div>
@@ -94,16 +94,16 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
           >
             <div className="mb-4">
               <div className="text-sm font-semibold text-gray-900 mb-1">
-                디자인 리스크 체크
+                Design Risk Check
               </div>
               <div className="text-xs text-gray-600">
-                디자인 시안 리스크 점검
+                Design review agent
               </div>
             </div>
             <div className="mt-auto flex justify-center">
               <img 
                 src="/assets/design-risk.png" 
-                alt="디자인 리스크 체크" 
+                alt="Design Risk Check" 
                 className="h-40 w-full max-w-[200px] object-contain object-bottom"
               />
             </div>
