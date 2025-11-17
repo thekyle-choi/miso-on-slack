@@ -9,6 +9,7 @@ import { BrowserWindow } from "@/components/browser-window"
 import { FinderWindow } from "@/components/finder-window"
 import { MisoAppWindow } from "@/components/miso-app-window"
 import { PhotosWindow } from "@/components/photos-window"
+import type { DesktopAsset } from "@/constants/desktop-assets"
 
 export default function Home() {
   const [isSlackOpen, setIsSlackOpen] = useState(false)
@@ -18,6 +19,7 @@ export default function Home() {
   const [isMisoOpen, setIsMisoOpen] = useState(false)
   const [isPhotosOpen, setIsPhotosOpen] = useState(false)
   const [browserInitialUrl, setBrowserInitialUrl] = useState("https://www.52g.gs")
+  const [queuedAttachments, setQueuedAttachments] = useState<DesktopAsset[]>([])
 
   const handleSlackClick = () => {
     console.log("Slack clicked, opening window...")
@@ -76,13 +78,23 @@ export default function Home() {
     setIsPhotosOpen(false)
   }
 
+  const handleQueueAttachment = (asset: DesktopAsset) => {
+    setQueuedAttachments((prev) => [...prev, asset])
+    setIsSlackOpen(true)
+  }
+
+  const handleExternalAttachmentsConsumed = (assetIds: string[]) => {
+    if (!assetIds.length) return
+    setQueuedAttachments((prev) => prev.filter((asset) => !assetIds.includes(asset.id)))
+  }
+
   console.log("isSlackOpen:", isSlackOpen)
 
   return (
     <>
       {/* 바탕화면은 항상 렌더링 */}
-      <MacDesktop 
-        onSlackClick={handleSlackClick} 
+      <MacDesktop
+        onSlackClick={handleSlackClick}
         isSlackOpen={isSlackOpen}
         onChromeClick={handleChromeClick}
         onMisoClick={handleMisoClick}
@@ -100,6 +112,8 @@ export default function Home() {
             onClose={handleSlackClose}
             onMinimize={handleSlackMinimize}
             onMaximize={handleSlackMaximize}
+            externalAttachments={queuedAttachments}
+            onExternalAttachmentsConsumed={handleExternalAttachmentsConsumed}
           />
         </MacAppWindow>
       </MacDesktop>
@@ -118,6 +132,7 @@ export default function Home() {
       <FinderWindow 
         isOpen={isFinderOpen}
         onClose={handleFinderClose}
+        onAttach={handleQueueAttachment}
       />
       
       {/* Miso 앱 윈도우 */}
@@ -130,6 +145,7 @@ export default function Home() {
       <PhotosWindow 
         isOpen={isPhotosOpen}
         onClose={handlePhotosClose}
+        onAttach={handleQueueAttachment}
       />
     </>
   )

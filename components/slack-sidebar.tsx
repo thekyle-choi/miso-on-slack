@@ -68,6 +68,21 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
               <span className="truncate">AnGenBot(Safety Bot)</span>
             </button>
             <button 
+              onClick={() => onChannelChange?.("design-risk-agent")}
+              className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
+                currentChannel === "design-risk-agent"
+                  ? "bg-white hover:bg-gray-100 text-gray-900"
+                  : "hover:bg-white/10 text-white/70 hover:text-white"
+              }`}
+            >
+              <Star className={`w-4 h-4 shrink-0 ${
+                currentChannel === "design-risk-agent"
+                  ? "fill-yellow-500 text-yellow-500"
+                  : "fill-yellow-400 text-yellow-400"
+              }`} />
+              <span className="truncate">Design Risk Agent</span>
+            </button>
+            <button 
               onClick={() => onChannelChange?.("plai-maker")}
               className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
                 currentChannel === "plai-maker"
@@ -93,9 +108,9 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
           </button>
           <div className="space-y-0.5 mt-1">
             <button 
-              onClick={() => onChannelChange?.("gs-52g-powerplant-tbm")}
+              onClick={() => onChannelChange?.("gs-52g-powerplant")}
               className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
-                currentChannel === "gs-52g-powerplant-tbm"
+                currentChannel === "gs-52g-powerplant"
                   ? "bg-white hover:bg-gray-100 text-gray-900"
                   : "hover:bg-white/10 text-white/70 hover:text-white"
               }`}
@@ -103,7 +118,7 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
               <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth={2} />
               </svg>
-              <span className="truncate">gs-52g-powerplant-tbm</span>
+              <span className="truncate">gs-52g-powerplant</span>
             </button>
             <button 
               onClick={() => onChannelChange?.("gs-52g-design-group")}
@@ -153,10 +168,17 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
             <span className="text-white/80 font-semibold">다이렉트 메시지</span>
           </button>
           <div className="space-y-0.5 mt-1">
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
+            <button 
+              onClick={() => onChannelChange?.("ally")}
+              className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
+                currentChannel === "ally"
+                  ? "bg-white hover:bg-gray-100 text-gray-900"
+                  : "hover:bg-white/10 text-white/70 hover:text-white"
+              }`}
+            >
               <div className="relative shrink-0">
                 <img 
-                  src="/assets/avatar_ally.jpg" 
+                  src="/assets/avatar_ally.png" 
                   alt="Ally" 
                   className="w-5 h-5 rounded-sm object-cover"
                 />
@@ -164,10 +186,17 @@ export function SlackSidebar({ currentChannel, onChannelChange }: SlackSidebarPr
               </div>
               <span className="truncate">Ally</span>
             </button>
-            <button className="flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded w-full text-sm text-white/70 hover:text-white transition-colors">
+            <button 
+              onClick={() => onChannelChange?.("zoey")}
+              className={`flex items-center gap-2 px-2 py-1 rounded w-full text-sm transition-colors ${
+                currentChannel === "zoey"
+                  ? "bg-white hover:bg-gray-100 text-gray-900"
+                  : "hover:bg-white/10 text-white/70 hover:text-white"
+              }`}
+            >
               <div className="relative shrink-0">
                 <img 
-                  src="/assets/avatar_zoey.jpg" 
+                  src="/assets/avatar_zoey.png" 
                   alt="Zoey" 
                   className="w-5 h-5 rounded-sm object-cover"
                 />

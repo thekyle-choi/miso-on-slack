@@ -34,6 +34,7 @@ export function MessagesList({
           isUpdate={message.isUpdate}
           event={message.event}
           attachment={message.attachment}
+          files={message.files}
           isLoading={message.isLoading}
           misoResult={message.misoResult}
           containerRef={containerRef}

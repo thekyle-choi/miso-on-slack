@@ -3,8 +3,8 @@
 // 이미지는 public/assets/ 폴더에 저장하고, 여기서 경로를 지정하세요.
 
 export const AVATARS: Record<string, string> = {
-  // 안젠봇 (TBM 문서 생성 봇)
-  "안젠봇": "/assets/anjenbot_avatar.png",
+  // anGenbot (TBM 문서 생성 봇)
+  "anGenbot": "/assets/anjenbot_avatar.png",
   
   // TBM 채널 인물들 - 로컬 이미지 사용
   "James Park(Maintenance)": "/assets/avatar_park_minsu.jpg",
@@ -16,10 +16,11 @@ export const AVATARS: Record<string, string> = {
   "Jessica Park(Designer)": "/assets/avatar_park_jieun.jpg",
   "Michael Kim(Team Lead)": "/assets/avatar_kim_minsu.jpg",
   "Daniel Lee(Design QA)": "/assets/avatar_lee_hyunwoo.jpg",
+  "Design Risk Agent": "/assets/design-risk.png",
   
   // 다이렉트 메시지 인물들
-  "Ally": "/assets/avatar_ally.jpg",
-  "Zoey": "/assets/avatar_zoey.jpg",
+  "Ally": "/assets/avatar_ally.png",
+  "Zoey": "/assets/avatar_zoey.png",
   "Young": "/assets/avatar_young.jpg",
   "Leo": "/assets/avatar_leo.jpg",
   "Ian": "/assets/avatar_ian.jpg",

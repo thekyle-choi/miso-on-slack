@@ -43,7 +43,7 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
             </div>
           </div>
 
-          {/* 안젠봇 (Safety Bot) */}
+          {/* anGenbot (Safety Bot) */}
           <div 
             onClick={() => onChannelChange?.("anjenbot-safety-bot")}
             className="bg-green-50 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full min-h-[280px]"
@@ -67,7 +67,7 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
 
           {/* 에너지 뉴스 클리핑 */}
           <div 
-            onClick={() => onChannelChange?.("gs-52g-powerplant-tbm")}
+            onClick={() => onChannelChange?.("gs-52g-powerplant")}
             className="bg-orange-50 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full min-h-[280px]"
           >
             <div className="mb-4">
@@ -89,7 +89,7 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
 
           {/* 디자인 리스크 체크 */}
           <div 
-            onClick={() => onChannelChange?.("gs-52g-design-group")}
+            onClick={() => onChannelChange?.("design-risk-agent")}
             className="bg-purple-50 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer flex flex-col h-full min-h-[280px]"
           >
             <div className="mb-4">
@@ -97,7 +97,7 @@ export function ChannelWelcome({ channelName, onChannelChange }: ChannelWelcomeP
                 Design Risk Check
               </div>
               <div className="text-xs text-gray-600">
-                Design review agent
+                Design risk assessment agent
               </div>
             </div>
             <div className="mt-auto flex justify-center">

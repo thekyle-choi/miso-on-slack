@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   title: 'miso on slack',
   description: 'AI-powered workflow automation on Slack',
   icons: {
-    icon: '/icons/slack-icon.png',
-    apple: '/icons/slack-icon.png',
+    icon: '/icons/slack-miso-icon.png',
+    apple: '/icons/slack-miso-icon.png',
   },
 }
 

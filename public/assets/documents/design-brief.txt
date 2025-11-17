@@ -1,0 +1,16 @@
+Design Risk Assessment Brief
+============================
+
+Project: Winter Campaign Poster
+Version: Draft v2
+
+Key Notes:
+- Primary color palette: #1B365D, #F2A900, #FFFFFF
+- Typography: Inter SemiBold (headline), Inter Regular (body)
+- Mandatory logos: 52G Main, GS Holdings Legal Footer
+- Usage restrictions: Internal digital signage only
+
+Open Questions:
+1. Confirm that the legal disclaimer is positioned above the fold.
+2. Validate that partner trademarks meet 20px minimum size.
+

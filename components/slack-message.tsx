@@ -1,97 +1,160 @@
 "use client"
 
 import Image from "next/image"
-import { MessageCircle, Smile, MoreHorizontal, RotateCcw, Loader2, FileText } from "lucide-react"
-import { useMemo, useState } from "react"
+import { MessageCircle, Smile, MoreHorizontal, RotateCcw, FileText, Search, Paperclip } from "lucide-react"
+import { useState, useMemo } from "react"
 import { MisoResultModal } from "@/components/miso-result-modal"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import type { MessageFileAttachment } from "@/constants/messages"
+
+// XML 태그 제거 함수
+function removeXmlTags(content: string): string {
+  // <tools> </tools> 태그 제거 (대소문자 구분 없이)
+  return content.replace(/<tools>[\s\S]*?<\/tools>/gi, "").trim()
+}
+
+// 도구 호출 파싱 및 렌더링 함수
+function parseToolCalls(content: string): Array<{ type: "text" | "tool"; content: string; toolData?: Record<string, unknown> }> {
+  // XML 태그 제거
+  const cleanedContent = removeXmlTags(content)
+  const parts: Array<{ type: "text" | "tool"; content: string; toolData?: Record<string, unknown> }> = []
+  const toolCallPattern = /\{[\s]*"query"[\s]*:[\s]*"([^"]+)"[\s]*\}/g
+  
+  let lastIndex = 0
+  let match
+  
+  while ((match = toolCallPattern.exec(cleanedContent)) !== null) {
+    // 도구 호출 이전의 텍스트
+    if (match.index > lastIndex) {
+      parts.push({ type: "text", content: cleanedContent.slice(lastIndex, match.index) })
+    }
+    
+    // 도구 호출 파싱
+    try {
+      const toolJson = match[0]
+      const toolData = JSON.parse(toolJson) as Record<string, unknown>
+      const query = toolData.query as string
+      parts.push({ type: "tool", content: query, toolData })
+    } catch {
+      // 파싱 실패 시 일반 텍스트로 처리
+      parts.push({ type: "text", content: match[0] })
+    }
+    
+    lastIndex = match.index + match[0].length
+  }
+  
+  // 마지막 도구 호출 이후의 텍스트
+  if (lastIndex < cleanedContent.length) {
+    parts.push({ type: "text", content: cleanedContent.slice(lastIndex) })
+  }
+  
+  // 매칭이 없으면 전체를 텍스트로 반환
+  if (parts.length === 0) {
+    parts.push({ type: "text", content: cleanedContent })
+  }
+  
+  return parts
+}
 
 // 마크다운 콘텐츠 렌더링 컴포넌트
 function MarkdownContent({ content }: { content: string }) {
-  const renderedContent = useMemo(() => {
-    const lines = content.split("\n")
-    const result: string[] = []
-    let inList = false
-    let listItems: string[] = []
-
-    const flushList = () => {
-      if (listItems.length > 0) {
-        result.push(`<ul class="list-disc ml-6 my-2 space-y-1">${listItems.join("")}</ul>`)
-        listItems = []
-        inList = false
-      }
-    }
-
-    for (const line of lines) {
-      // 제목 처리
-      if (line.match(/^### /)) {
-        flushList()
-        result.push(`<h3 class="font-bold text-base mt-4 mb-2">${line.replace(/^### /, "")}</h3>`)
-        continue
-      }
-      if (line.match(/^## /)) {
-        flushList()
-        result.push(`<h2 class="font-bold text-lg mt-5 mb-3">${line.replace(/^## /, "")}</h2>`)
-        continue
-      }
-      if (line.match(/^# /)) {
-        flushList()
-        result.push(`<h1 class="font-bold text-xl mt-6 mb-4">${line.replace(/^# /, "")}</h1>`)
-        continue
-      }
-
-      // 구분선 처리
-      if (line.trim() === "---") {
-        flushList()
-        result.push('<hr class="my-4 border-gray-300" />')
-        continue
-      }
-
-      // 체크박스 리스트 처리
-      if (line.match(/^- \[ \] /)) {
-        flushList()
-        const text = line.replace(/^- \[ \] /, "")
-        result.push(`<div class="ml-4 flex items-start gap-2 my-1"><span class="text-gray-400">☐</span><span>${text}</span></div>`)
-        continue
-      }
-      if (line.match(/^- \[x\] /)) {
-        flushList()
-        const text = line.replace(/^- \[x\] /, "")
-        result.push(`<div class="ml-4 flex items-start gap-2 my-1"><span class="text-gray-600">☑</span><span>${text}</span></div>`)
-        continue
-      }
-
-      // 일반 리스트 처리
-      if (line.match(/^- /)) {
-        if (!inList) {
-          inList = true
+  const parsedContent = useMemo(() => parseToolCalls(content), [content])
+  
+  return (
+    <div className="markdown-content leading-[1.15]">
+      {parsedContent.map((part, idx) => {
+        if (part.type === "tool") {
+          // 도구 호출 UI 렌더링
+          return (
+            <div key={idx} className="my-1.5 flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-200 rounded-md">
+              <Search className="w-4 h-4 text-gray-600 shrink-0" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-gray-500">Searching internal data</span>
+                <span className="text-sm text-gray-900">{part.content}</span>
+              </div>
+            </div>
+          )
         }
-        const text = line.replace(/^- /, "")
-        listItems.push(`<li>${text}</li>`)
-        continue
-      }
-
-      // 리스트가 끝나면 플러시
-      if (inList && line.trim() === "") {
-        flushList()
-        continue
-      }
-
-      // 일반 텍스트
-      flushList()
-      if (line.trim()) {
-        // 볼드 처리
-        let processedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
-        result.push(`<p class="my-1">${processedLine}</p>`)
-      } else {
-        result.push("<br />")
-      }
-    }
-
-    flushList()
-    return result.join("")
-  }, [content])
-
-  return <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderedContent }} />
+        
+        // 일반 텍스트는 마크다운으로 렌더링
+        return (
+          <ReactMarkdown
+            key={idx}
+            remarkPlugins={[remarkGfm]}
+            components={{
+              // 제목 스타일링 (컴팩트하게)
+              h1: ({ children }) => <h1 className="font-bold text-xl mt-3 mb-2 leading-tight">{children}</h1>,
+              h2: ({ children }) => <h2 className="font-bold text-lg mt-2.5 mb-1.5 leading-tight">{children}</h2>,
+              h3: ({ children }) => <h3 className="font-bold text-base mt-2 mb-1 leading-tight">{children}</h3>,
+              h4: ({ children }) => <h4 className="font-bold text-sm mt-1.5 mb-1 leading-tight">{children}</h4>,
+              h5: ({ children }) => <h5 className="font-bold text-sm mt-1.5 mb-1 leading-tight">{children}</h5>,
+              h6: ({ children }) => <h6 className="font-bold text-sm mt-1.5 mb-1 leading-tight">{children}</h6>,
+              // 단락 스타일링 (행간 좁게)
+              p: ({ children }) => <p className="my-0 leading-[1.15]">{children}</p>,
+              // 리스트 스타일링 (간격 좁게)
+              ul: ({ children }) => <ul className="list-disc ml-5 my-1">{children}</ul>,
+              ol: ({ children }) => <ol className="list-decimal ml-5 my-1">{children}</ol>,
+              li: ({ children }) => <li className="leading-[1.1] my-0">{children}</li>,
+              // 볼드 스타일링
+              strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+              // 이탤릭
+              em: ({ children }) => <em className="italic">{children}</em>,
+              // 링크
+              a: ({ href, children }) => (
+                <a href={href} className="text-[#1264A3] hover:underline" target="_blank" rel="noopener noreferrer">
+                  {children}
+                </a>
+              ),
+              // 테이블 스타일링 (컴팩트하게)
+              table: ({ children }) => (
+                <div className="my-2 overflow-x-auto">
+                  <table className="min-w-full border-collapse border border-gray-300 text-sm">{children}</table>
+                </div>
+              ),
+              thead: ({ children }) => <thead className="bg-gray-50">{children}</thead>,
+              tbody: ({ children }) => <tbody>{children}</tbody>,
+              tr: ({ children }) => <tr className="border-b border-gray-200">{children}</tr>,
+              th: ({ children }) => (
+                <th className="border border-gray-300 px-2 py-1 bg-gray-50 font-semibold text-left text-xs">
+                  {children}
+                </th>
+              ),
+              td: ({ children }) => (
+                <td className="border border-gray-300 px-2 py-1 text-xs leading-[1.15]">
+                  {children}
+                </td>
+              ),
+              // 구분선 (간격 좁게)
+              hr: () => <hr className="my-2 border-gray-300" />,
+              // 코드 블록 (컴팩트하게)
+              code: ({ className, children }) => {
+                const isInline = !className
+                return isInline ? (
+                  <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono leading-[1.15]">{children}</code>
+                ) : (
+                  <code className={className}>{children}</code>
+                )
+              },
+              pre: ({ children }) => (
+                <pre className="bg-gray-100 p-2 rounded my-1.5 overflow-x-auto text-xs leading-[1.15]">
+                  {children}
+                </pre>
+              ),
+              // 블록쿼트
+              blockquote: ({ children }) => (
+                <blockquote className="border-l-4 border-gray-300 pl-3 my-1.5 text-gray-700 italic">
+                  {children}
+                </blockquote>
+              ),
+            }}
+          >
+            {part.content}
+          </ReactMarkdown>
+        )
+      })}
+    </div>
+  )
 }
 
 interface SlackMessageProps {
@@ -113,6 +176,7 @@ interface SlackMessageProps {
     title: string
     subtitle: string
   }
+  files?: MessageFileAttachment[]
   isLoading?: boolean
   misoResult?: string
   containerRef?: React.RefObject<HTMLElement>
@@ -129,6 +193,7 @@ export function SlackMessage({
   isUpdate,
   event,
   attachment,
+  files,
   isLoading,
   misoResult,
   containerRef,
@@ -173,12 +238,162 @@ export function SlackMessage({
           <span className="text-[12px] text-gray-500">{time}</span>
         </div>
 
-        <div className="text-[15px] text-gray-900 leading-[1.46668]">
+        <div className="text-[15px] text-gray-900 leading-[1.46668] whitespace-pre-wrap">
           {isLoading ? (
-            <div className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
-              <span className="text-gray-600">{content}</span>
-            </div>
+            (() => {
+              const LOADING_TEXT = "Preparing response..."
+              const trimmed = content.trim()
+              const isInitialLoading = !trimmed || trimmed === LOADING_TEXT
+
+              if (isInitialLoading) {
+                return (
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="inline-flex w-4 h-4 rounded-full border-2 border-gray-200 border-t-[#1264A3] animate-spin"
+                      aria-hidden="true"
+                    />
+                    <span className="text-gray-600 whitespace-pre-wrap">{trimmed || LOADING_TEXT}</span>
+                  </div>
+                )
+              }
+
+              return attachment?.type === "markdown" ? (
+                <MarkdownContent content={content} />
+              ) : (
+                (() => {
+                  // 멘션 패턴: @이름(역할) 또는 @이름 형식 (한글, 영문, 숫자 포함)
+                  const mentionPattern = /(@[가-힣\w]+(?:\([가-힣\w]+\))?)/g
+                  const parts: Array<{ text: string; isMention: boolean }> = []
+                  let lastIndex = 0
+                  let match
+
+                  while ((match = mentionPattern.exec(content)) !== null) {
+                    // 멘션 이전의 일반 텍스트
+                    if (match.index > lastIndex) {
+                      parts.push({ text: content.slice(lastIndex, match.index), isMention: false })
+                    }
+                    // 멘션
+                    parts.push({ text: match[0], isMention: true })
+                    lastIndex = mentionPattern.lastIndex
+                  }
+
+                  // 마지막 멘션 이후의 일반 텍스트
+                  if (lastIndex < content.length) {
+                    parts.push({ text: content.slice(lastIndex), isMention: false })
+                  }
+
+                  // 빈 문자열이 아닌 경우에만 처리
+                  if (parts.length === 0) {
+                    parts.push({ text: content, isMention: false })
+                  }
+
+                  return parts.map((part, idx) => {
+                    if (part.isMention) {
+                      return (
+                        <span key={idx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
+                          {part.text}
+                        </span>
+                      )
+                    } else {
+                      // 일반 텍스트 내에서 볼드, 슬래시 명령어, 이모지 처리
+                      return (
+                        <span key={idx}>
+                          {part.text.split(/(\*\*[^*]+\*\*|\/[\w]+|📘)/g).map((subPart, subIdx) => {
+                            // 볼드 마크다운 처리: **텍스트**
+                            if (subPart.startsWith("**") && subPart.endsWith("**") && subPart.length > 4) {
+                              const boldText = subPart.slice(2, -2)
+                              return (
+                                <strong key={subIdx} className="font-semibold">
+                                  {boldText}
+                                </strong>
+                              )
+                            }
+                            // 슬래시 명령어 처리
+                            if (subPart.startsWith("/") && /^\/[\w]+$/.test(subPart)) {
+                              return (
+                                <span key={subIdx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
+                                  {subPart}
+                                </span>
+                              )
+                            }
+                            return <span key={subIdx}>{subPart}</span>
+                          })}
+                        </span>
+                      )
+                    }
+                  })
+                })()
+              )
+            })()
+          ) : misoResult ? (
+            // 스트리밍 중: 로딩 스피너 없이 텍스트만 표시
+            attachment?.type === "markdown" ? (
+              <MarkdownContent content={content} />
+            ) : (
+              (() => {
+                // 멘션 패턴: @이름(역할) 또는 @이름 형식 (한글, 영문, 숫자 포함)
+                const mentionPattern = /(@[가-힣\w]+(?:\([가-힣\w]+\))?)/g
+                const parts: Array<{ text: string; isMention: boolean }> = []
+                let lastIndex = 0
+                let match
+
+                while ((match = mentionPattern.exec(content)) !== null) {
+                  // 멘션 이전의 일반 텍스트
+                  if (match.index > lastIndex) {
+                    parts.push({ text: content.slice(lastIndex, match.index), isMention: false })
+                  }
+                  // 멘션
+                  parts.push({ text: match[0], isMention: true })
+                  lastIndex = mentionPattern.lastIndex
+                }
+
+                // 마지막 멘션 이후의 일반 텍스트
+                if (lastIndex < content.length) {
+                  parts.push({ text: content.slice(lastIndex), isMention: false })
+                }
+
+                // 빈 문자열이 아닌 경우에만 처리
+                if (parts.length === 0) {
+                  parts.push({ text: content, isMention: false })
+                }
+
+                return parts.map((part, idx) => {
+                  if (part.isMention) {
+                  return (
+                    <span key={idx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
+                        {part.text}
+                    </span>
+                  )
+                  } else {
+                    // 일반 텍스트 내에서 볼드, 슬래시 명령어, 이모지 처리
+                    return (
+                      <span key={idx}>
+                        {part.text.split(/(\*\*[^*]+\*\*|\/[\w]+|📘)/g).map((subPart, subIdx) => {
+                          // 볼드 마크다운 처리: **텍스트**
+                          if (subPart.startsWith("**") && subPart.endsWith("**") && subPart.length > 4) {
+                            const boldText = subPart.slice(2, -2)
+                            return (
+                              <strong key={subIdx} className="font-semibold">
+                                {boldText}
+                              </strong>
+                            )
+                          }
+                          // 슬래시 명령어 처리
+                          if (subPart.startsWith("/") && /^\/[\w]+$/.test(subPart)) {
+                  return (
+                              <span key={subIdx} className="text-[#1264A3] font-medium bg-[#E8F5FA] hover:bg-[#D8EDF5] px-0.5 rounded cursor-pointer">
+                                {subPart}
+                              </span>
+                            )
+                          }
+                          return <span key={subIdx}>{subPart}</span>
+                        })}
+                    </span>
+                  )
+                }
+              })
+              })()
+            )
           ) : misoResult ? (
             <button
               onClick={() => setIsModalOpen(true)}
@@ -197,9 +412,7 @@ export function SlackMessage({
               </div>
             </button>
           ) : attachment?.type === "markdown" ? (
-            <div className="prose prose-sm max-w-none">
-              <MarkdownContent content={content} />
-            </div>
+            <MarkdownContent content={content} />
           ) : (
             (() => {
               // 멘션 패턴: @이름(역할) 또는 @이름 형식 (한글, 영문, 숫자 포함)
@@ -277,7 +490,41 @@ export function SlackMessage({
           </div>
         )}
 
-        {attachment && (
+        {files && files.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-3">
+            {files.map((file) =>
+              file.type === "image" ? (
+                <div
+                  key={file.id}
+                  className="relative w-32 h-32 rounded-md overflow-hidden border border-gray-200 shadow-sm"
+                >
+                  <Image
+                    src={file.url}
+                    alt={file.name}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs px-2 py-1 truncate">
+                    {file.name}
+                  </div>
+                </div>
+              ) : (
+                <div
+                  key={file.id}
+                  className="flex items-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-700"
+                >
+                  <Paperclip className="w-4 h-4 text-gray-500" />
+                  <div className="flex flex-col">
+                    <span className="font-medium">{file.name}</span>
+                    <span className="text-xs text-gray-500">{file.sizeLabel}</span>
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        )}
+
+        {attachment && attachment.type !== "markdown" && !isLoading && (
           <>
             <button className="mt-1 flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900">
               <span>Post</span>

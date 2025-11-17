@@ -51,12 +51,13 @@ const TBM_TABS: Tab[] = [
 
 export function ChannelTabs({ tabs, onTabClick, currentChannel }: ChannelTabsProps) {
   // 채널별 탭 결정
-  // "일반" 채널과 "gs-52g-powerplant-tbm", "gs-52g-design-group", 즐겨찾기 채널들은 메시지 탭만 표시
+  // "일반" 채널과 "gs-52g-powerplant", "gs-52g-design-group", 즐겨찾기 채널들은 메시지 탭만 표시
   const displayTabs = tabs || (
     currentChannel === "일반" || 
-    currentChannel === "gs-52g-powerplant-tbm" || 
+    currentChannel === "gs-52g-powerplant" || 
     currentChannel === "gs-52g-design-group" ||
     currentChannel === "anjenbot-safety-bot" ||
+    currentChannel === "design-risk-agent" ||
     currentChannel === "hr-policy-agent" ||
     currentChannel === "plai-maker"
       ? TBM_TABS 

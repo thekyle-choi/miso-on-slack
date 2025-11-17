@@ -1,59 +1,58 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Image from "next/image"
-import { X, Minus, Maximize2, Grid3x3, List, ChevronLeft, ChevronRight } from "lucide-react"
+import { X, Minus, Maximize2, Grid3x3, List, ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { PHOTOS_LIBRARY, type DesktopAsset } from "@/constants/desktop-assets"
 
 interface PhotosWindowProps {
   isOpen: boolean
   onClose: () => void
+  onAttach?: (asset: DesktopAsset) => void
 }
 
-// 샘플 사진 목록
-const SAMPLE_PHOTOS = [
-  { id: 1, src: "/photos/photo1.jpg", name: "Photo 1" },
-  { id: 2, src: "/photos/photo2.png", name: "Photo 2" },
-  { id: 3, src: "/photos/photo3.jpg", name: "Photo 3" },
-  { id: 4, src: "/photos/photo4.png", name: "Photo 4" },
-  { id: 5, src: "/photos/photo5.png", name: "Photo 5" },
-  { id: 6, src: "/photos/photo6.jpg", name: "Photo 6" },
-  { id: 7, src: "/photos/photo7.jpg", name: "Photo 7" },
-]
-
-export function PhotosWindow({ isOpen, onClose }: PhotosWindowProps) {
-  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null)
+export function PhotosWindow({ isOpen, onClose, onAttach }: PhotosWindowProps) {
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
 
   if (!isOpen) return null
 
-  const handlePhotoClick = (photoId: number) => {
-    setSelectedPhoto(photoId)
+  const handlePhotoClick = (photoId: string) => {
+    setSelectedPhotoId(photoId)
   }
 
   const handleCloseDetail = () => {
-    setSelectedPhoto(null)
+    setSelectedPhotoId(null)
   }
 
   const handlePrevious = () => {
-    if (selectedPhoto === null) return
-    const currentIndex = SAMPLE_PHOTOS.findIndex((p) => p.id === selectedPhoto)
-    const previousIndex = currentIndex > 0 ? currentIndex - 1 : SAMPLE_PHOTOS.length - 1
-    setSelectedPhoto(SAMPLE_PHOTOS[previousIndex].id)
+    if (selectedPhotoId === null) return
+    const currentIndex = PHOTOS_LIBRARY.findIndex((p) => p.id === selectedPhotoId)
+    if (currentIndex === -1) return
+    const previousIndex = currentIndex > 0 ? currentIndex - 1 : PHOTOS_LIBRARY.length - 1
+    setSelectedPhotoId(PHOTOS_LIBRARY[previousIndex].id)
   }
 
   const handleNext = () => {
-    if (selectedPhoto === null) return
-    const currentIndex = SAMPLE_PHOTOS.findIndex((p) => p.id === selectedPhoto)
-    const nextIndex = currentIndex < SAMPLE_PHOTOS.length - 1 ? currentIndex + 1 : 0
-    setSelectedPhoto(SAMPLE_PHOTOS[nextIndex].id)
+    if (selectedPhotoId === null) return
+    const currentIndex = PHOTOS_LIBRARY.findIndex((p) => p.id === selectedPhotoId)
+    if (currentIndex === -1) return
+    const nextIndex = currentIndex < PHOTOS_LIBRARY.length - 1 ? currentIndex + 1 : 0
+    setSelectedPhotoId(PHOTOS_LIBRARY[nextIndex].id)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (selectedPhoto === null) return
+    if (selectedPhotoId === null) return
     if (e.key === "ArrowLeft") handlePrevious()
     if (e.key === "ArrowRight") handleNext()
     if (e.key === "Escape") handleCloseDetail()
   }
+
+  const selectedAsset = useMemo(() => {
+    if (!selectedPhotoId) return undefined
+    return PHOTOS_LIBRARY.find((photo) => photo.id === selectedPhotoId)
+  }, [selectedPhotoId])
 
   return (
     <div 
@@ -162,8 +161,19 @@ export function PhotosWindow({ isOpen, onClose }: PhotosWindowProps) {
                   <List className="w-4 h-4" />
                 </button>
               </div>
-              <div className="text-sm text-gray-600">
-                {SAMPLE_PHOTOS.length} photos
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-gray-600">
+                  {PHOTOS_LIBRARY.length} photos
+                </div>
+                {selectedAsset && (
+                  <Button
+                    size="sm"
+                    className="h-8 px-3 text-xs"
+                    onClick={() => onAttach?.(selectedAsset)}
+                  >
+                    Slack에 첨부
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -171,34 +181,41 @@ export function PhotosWindow({ isOpen, onClose }: PhotosWindowProps) {
             <div className="flex-1 overflow-y-auto p-4">
               {viewMode === "grid" ? (
                 <div className="grid grid-cols-4 gap-4">
-                  {SAMPLE_PHOTOS.map((photo) => (
+                  {PHOTOS_LIBRARY.map((photo) => (
                     <div
                       key={photo.id}
                       onClick={() => handlePhotoClick(photo.id)}
-                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group hover:opacity-90 transition-opacity bg-gray-100"
+                      className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer group transition-all ${
+                        selectedPhotoId === photo.id ? "ring-2 ring-blue-500" : "hover:opacity-90"
+                      } bg-gray-100`}
                     >
                       <Image
-                        src={photo.src}
+                        src={photo.thumbnailSrc || photo.src}
                         alt={photo.name}
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                      <div className="absolute bottom-2 left-2 right-2 rounded bg-black/60 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        {photo.name}
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {SAMPLE_PHOTOS.map((photo) => (
+                  {PHOTOS_LIBRARY.map((photo) => (
                     <div
                       key={photo.id}
                       onClick={() => handlePhotoClick(photo.id)}
-                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                      className={`flex items-center gap-4 p-3 rounded-lg cursor-pointer transition-colors ${
+                        selectedPhotoId === photo.id ? "bg-blue-50" : "hover:bg-gray-100"
+                      }`}
                     >
                       <div className="relative w-20 h-20 rounded overflow-hidden shrink-0 bg-gray-200">
                         <Image
-                          src={photo.src}
+                          src={photo.thumbnailSrc || photo.src}
                           alt={photo.name}
                           fill
                           className="object-cover"
@@ -207,7 +224,10 @@ export function PhotosWindow({ isOpen, onClose }: PhotosWindowProps) {
                       </div>
                       <div className="flex-1">
                         <div className="text-sm font-medium text-gray-900">{photo.name}</div>
-                        <div className="text-xs text-gray-500">JPEG Image</div>
+                        <div className="text-xs text-gray-500 flex items-center gap-1">
+                          <ImageIcon className="h-3.5 w-3.5" />
+                          {photo.displayName} · {photo.sizeLabel}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -218,7 +238,7 @@ export function PhotosWindow({ isOpen, onClose }: PhotosWindowProps) {
         </div>
 
         {/* 사진 상세 보기 모달 */}
-        {selectedPhoto !== null && (
+        {selectedAsset && (
           <div 
             className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center"
             onClick={handleCloseDetail}
@@ -232,6 +252,17 @@ export function PhotosWindow({ isOpen, onClose }: PhotosWindowProps) {
               >
                 <X className="w-6 h-6" />
               </button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="absolute top-4 right-16 bg-white/10 text-white border-white/30 hover:bg-white/20"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onAttach?.(selectedAsset)
+                }}
+              >
+                Slack에 첨부
+              </Button>
 
               {/* 이전 버튼 */}
               <button
@@ -263,8 +294,8 @@ export function PhotosWindow({ isOpen, onClose }: PhotosWindowProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 <Image
-                  src={SAMPLE_PHOTOS.find((p) => p.id === selectedPhoto)?.src || ""}
-                  alt={SAMPLE_PHOTOS.find((p) => p.id === selectedPhoto)?.name || ""}
+                  src={selectedAsset.src}
+                  alt={selectedAsset.name}
                   width={1200}
                   height={800}
                   className="max-w-full max-h-[90vh] object-contain"
@@ -274,7 +305,7 @@ export function PhotosWindow({ isOpen, onClose }: PhotosWindowProps) {
 
               {/* 사진 정보 */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm">
-                {SAMPLE_PHOTOS.findIndex((p) => p.id === selectedPhoto) + 1} / {SAMPLE_PHOTOS.length}
+                {PHOTOS_LIBRARY.findIndex((p) => p.id === selectedAsset.id) + 1} / {PHOTOS_LIBRARY.length}
               </div>
             </div>
           </div>

@@ -70,11 +70,11 @@ export function MacDock({ onSlackClick, isSlackOpen, onChromeClick, onMisoClick,
             console.log("Dock Slack button clicked!")
             onSlackClick?.()
           }}
-          className="group relative flex items-center justify-center w-14 h-14 rounded-xl bg-white hover:scale-110 transition-transform duration-200 shadow-lg overflow-hidden"
+          className="group relative flex items-center justify-center w-14 h-14 rounded-xl hover:scale-110 transition-transform duration-200 overflow-hidden"
         >
-          <div className="relative w-10 h-10">
+          <div className="relative w-full h-full">
             <Image
-              src="/icons/slack-icon.png"
+              src="/icons/slack-miso-icon.png"
               alt="Slack"
               fill
               className="object-contain"

@@ -10,10 +10,24 @@ export type SlackCommand = {
 export const SLACK_COMMANDS: SlackCommand[] = [
   {
     id: 'generate-tbm-docs',
-    title: 'Generate TBM Docs (안젠봇)',
+    title: 'Generate TBM Docs (anGenbot)',
     appName: 'MISO',
-    icon: '/assets/anjenbot_avatar.png', // 안젠봇 아바타 이미지 사용
+    icon: '/assets/anjenbot_avatar.png', // anGenbot 아바타 이미지 사용
     action: '/tbm',
+  },
+  {
+    id: 'energy-news-scraping',
+    title: 'Energy News Scraping',
+    appName: 'MISO',
+    icon: '/assets/energynews.png',
+    action: '/energynews',
+  },
+  {
+    id: 'design-risk-assessment',
+    title: 'Design Risk Assessment',
+    appName: 'MISO',
+    icon: '/assets/design-risk.png',
+    action: '/designrisk',
   },
 ]
 

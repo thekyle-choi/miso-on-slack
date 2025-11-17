@@ -23,10 +23,12 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { FINDER_ATTACHMENTS, type DesktopAsset } from "@/constants/desktop-assets"
 
 interface FinderWindowProps {
   isOpen: boolean
   onClose: () => void
+  onAttach?: (asset: DesktopAsset) => void
 }
 
 type ViewMode = "icons" | "list" | "columns" | "gallery"
@@ -42,12 +44,13 @@ type FileItem = {
   name: string
   type: "folder" | "file"
   icon: React.ComponentType<{ className?: string }>
+  attachmentId?: string
   size?: string
   modified?: string
   color?: string
 }
 
-export function FinderWindow({ isOpen, onClose }: FinderWindowProps) {
+export function FinderWindow({ isOpen, onClose, onAttach }: FinderWindowProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("icons")
   const [currentPath, setCurrentPath] = useState("최근 항목")
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
@@ -98,6 +101,7 @@ export function FinderWindow({ isOpen, onClose }: FinderWindowProps) {
       name: "보고서.pdf", 
       type: "file", 
       icon: FileText,
+    attachmentId: "4",
       color: "text-red-500",
       size: "2.4 MB",
       modified: "오늘 오전 9:15"
@@ -107,6 +111,7 @@ export function FinderWindow({ isOpen, onClose }: FinderWindowProps) {
       name: "vacation.jpg", 
       type: "file", 
       icon: ImageIcon,
+    attachmentId: "5",
       color: "text-orange-500",
       size: "5.1 MB",
       modified: "2024.11.05"
@@ -137,8 +142,25 @@ export function FinderWindow({ isOpen, onClose }: FinderWindowProps) {
       color: "text-gray-500",
       size: "1.2 KB",
       modified: "2024.10.28"
+  },
+  { 
+    id: "9", 
+    name: "design-risk.png", 
+    type: "file", 
+    icon: ImageIcon,
+    attachmentId: "9",
+    color: "text-purple-500",
+    size: "820 KB",
+    modified: "2024.11.07"
     },
   ]
+
+  const selectedAttachment = (() => {
+    if (!selectedItem) return undefined
+    const file = fileItems.find((item) => item.id === selectedItem)
+    if (!file?.attachmentId) return undefined
+    return FINDER_ATTACHMENTS[file.attachmentId]
+  })()
 
   if (!isOpen) return null
 
@@ -449,9 +471,20 @@ export function FinderWindow({ isOpen, onClose }: FinderWindowProps) {
                 {fileItems.length}개 항목
                 {selectedItem && " · 1개 선택됨"}
               </span>
-              <span className="text-xs text-gray-600">
-                여유 공간: 256 GB
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600">
+                  여유 공간: 256 GB
+                </span>
+                {selectedAttachment && (
+                  <Button
+                    size="sm"
+                    className="h-7 px-3 text-xs"
+                    onClick={() => onAttach?.(selectedAttachment)}
+                  >
+                    Slack에 첨부
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>

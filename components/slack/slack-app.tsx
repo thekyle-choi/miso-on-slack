@@ -10,6 +10,8 @@ import { ChannelTabs } from "./channel-tabs"
 import { MessagesList } from "./messages-list"
 import { ChannelWelcome } from "@/components/channel-welcome"
 import { MOCK_MESSAGES, CHANNEL_MOCK_MESSAGES, type Message } from "@/constants/messages"
+import type { DesktopAsset } from "@/constants/desktop-assets"
+import type { SlackSendMessagePayload } from "@/types/slack"
 
 interface SlackAppProps {
   channelName?: string
@@ -18,6 +20,8 @@ interface SlackAppProps {
   onClose?: () => void
   onMinimize?: () => void
   onMaximize?: () => void
+  externalAttachments?: DesktopAsset[]
+  onExternalAttachmentsConsumed?: (assetIds: string[]) => void
 }
 
 // 채널 정보 타입 정의
@@ -40,8 +44,8 @@ const CHANNELS: Record<string, ChannelInfo> = {
     name: "gs-graphon",
     memberCount: 8,
   },
-  "gs-52g-powerplant-tbm": {
-    name: "gs-52g-powerplant-tbm",
+  "gs-52g-powerplant": {
+    name: "gs-52g-powerplant",
     memberCount: 5,
   },
   "gs-52g-design-group": {
@@ -52,12 +56,24 @@ const CHANNELS: Record<string, ChannelInfo> = {
     name: "AnGenBot(Safety Bot)",
     memberCount: 1,
   },
+  "design-risk-agent": {
+    name: "Design Risk Agent",
+    memberCount: 1,
+  },
   "hr-policy-agent": {
     name: "HR Policy Agent",
     memberCount: 1,
   },
   "plai-maker": {
     name: "PLAI MAKER",
+    memberCount: 1,
+  },
+  "ally": {
+    name: "Ally",
+    memberCount: 1,
+  },
+  "zoey": {
+    name: "Zoey",
     memberCount: 1,
   },
 }
@@ -72,6 +88,8 @@ export function SlackApp({
   onClose,
   onMinimize,
   onMaximize,
+  externalAttachments,
+  onExternalAttachmentsConsumed,
 }: SlackAppProps) {
   // 현재 채널 상태 관리
   const [currentChannel, setCurrentChannel] = useState<string>(initialChannelName)
@@ -86,7 +104,7 @@ export function SlackApp({
     }
     
     // HR Policy Agent와 같은 특정 채널은 항상 기본 목업 메시지만 사용
-    const alwaysUseMockChannels = ["hr-policy-agent", "anjenbot-safety-bot", "plai-maker"]
+    const alwaysUseMockChannels = ["hr-policy-agent", "anjenbot-safety-bot", "design-risk-agent", "plai-maker", "ally", "zoey"]
     if (alwaysUseMockChannels.includes(channel)) {
       return CHANNEL_MOCK_MESSAGES[channel] || []
     }
@@ -124,9 +142,20 @@ export function SlackApp({
         let updated = false
         const newMessages = prev.map((msg) => {
           // 로딩 중인 메시지이고, 해당 taskId의 결과가 있으면 교체
-          if (msg.isLoading && msg.taskId && taskResults[msg.taskId]) {
+          if (msg.taskId && taskResults[msg.taskId]) {
             updated = true
             const result = taskResults[msg.taskId]
+            
+            // 에너지뉴스 명령어인지 확인 (sender로 판단)
+            const isEnergyNewsCommand = msg.sender === "News Agent"
+            const isDesignRiskMessage = msg.sender === "Design Risk Agent"
+            const avatar =
+              msg.avatar ||
+              (isEnergyNewsCommand
+                ? "/assets/energynews.png"
+                : isDesignRiskMessage
+                  ? "/assets/design-risk.png"
+                  : "/assets/anjenbot_avatar.png")
             
             // 에러 메시지인 경우
             if (result.startsWith("ERROR:")) {
@@ -135,16 +164,36 @@ export function SlackApp({
                 isLoading: false,
                 content: result.replace("ERROR:", ""),
                 isBot: true,
-                avatar: "/assets/anjenbot_avatar.png", // 안젠봇 아바타 유지
+                avatar,
+                attachment: undefined,
               }
             }
             // 정상 결과인 경우
-            return {
-              ...msg,
-              isLoading: false,
-              content: "MISO 워크플로우 결과",
-              misoResult: result,
-              avatar: "/assets/anjenbot_avatar.png", // 안젠봇 아바타 유지
+            const isAnGenBotChannel = currentChannel === "anjenbot-safety-bot"
+            const isDesignRiskChannel = currentChannel === "design-risk-agent"
+            if (isAnGenBotChannel || isEnergyNewsCommand || isDesignRiskChannel || isDesignRiskMessage) {
+              // AnGenBot 채널 또는 Energy News: 일반 메시지처럼 content에 직접 텍스트 표시
+              return {
+                ...msg,
+                isLoading: false,
+                content: result,
+                isBot: true,
+                avatar,
+                attachment: {
+                  type: "markdown",
+                  title: "",
+                  subtitle: "",
+                },
+              }
+            } else {
+              // MISO 워크플로우 (TBM): 특별한 형태로 표시 (misoResult 사용)
+              return {
+                ...msg,
+                isLoading: false,
+                content: "MISO 워크플로우 결과",
+                misoResult: result,
+                avatar: "/assets/anjenbot_avatar.png", // anGenbot 아바타 유지
+              }
             }
           }
           return msg
@@ -187,7 +236,7 @@ export function SlackApp({
     if (typeof window === "undefined") return
     
     // HR Policy Agent와 같은 특정 채널은 메시지를 저장하지 않음
-    const alwaysUseMockChannels = ["hr-policy-agent", "anjenbot-safety-bot", "plai-maker"]
+    const alwaysUseMockChannels = ["hr-policy-agent", "anjenbot-safety-bot", "design-risk-agent", "plai-maker", "ally", "zoey"]
     if (alwaysUseMockChannels.includes(currentChannel)) {
       return
     }
@@ -213,9 +262,42 @@ export function SlackApp({
     return `${ampm} ${displayHours}:${minutes.toString().padStart(2, "0")}`
   }, [])
 
+  const handleStreamingUpdate = useCallback((taskId: string, content: string) => {
+    setMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.taskId === taskId && msg.isLoading) {
+          // 에너지뉴스 명령어인지 확인 (sender로 판단)
+          const isEnergyNewsCommand = msg.sender === "News Agent"
+          const isDesignRiskMessage = msg.sender === "Design Risk Agent"
+          const avatar =
+            msg.avatar ||
+            (isEnergyNewsCommand
+              ? "/assets/energynews.png"
+              : isDesignRiskMessage
+                ? "/assets/design-risk.png"
+                : "/assets/anjenbot_avatar.png")
+          
+          return {
+            ...msg,
+            content,
+            isBot: true,
+            isLoading: true, // 스트리밍 중에는 계속 로딩 상태 유지
+            avatar,
+            attachment: {
+              type: "markdown",
+              title: "",
+              subtitle: "",
+            },
+          }
+        }
+        return msg
+      })
+    )
+  }, [])
+
   // 메시지 전송 핸들러
   const handleMessageSent = useCallback(
-    (messageText: string, result?: string, taskId?: string) => {
+    ({ message, result, taskId, attachments }: SlackSendMessagePayload) => {
       const now = new Date()
       const hours = now.getHours()
       const minutes = now.getMinutes()
@@ -223,24 +305,45 @@ export function SlackApp({
       const displayHours = hours % 12 || 12
       const timeString = `${ampm} ${displayHours}:${minutes.toString().padStart(2, "0")}`
 
-      // 빈 문자열이 아니면 사용자 메시지 추가
-      if (messageText) {
+      const rawMessage = message ?? ""
+      const trimmedMessage = rawMessage.trim()
+      const hasUserMessage = trimmedMessage.length > 0 || (attachments && attachments.length > 0)
+
+      if (hasUserMessage) {
         const userMessage: Message = {
           sender: "You",
           time: timeString,
-          content: messageText,
+          content: rawMessage,
           avatar: "/assets/mini_kyle_default.png",
+          files: attachments && attachments.length > 0 ? attachments : undefined,
         }
 
         setMessages((prev) => [...prev, userMessage])
 
-        // /tbm 명령어인 경우 로딩 메시지 추가
-        if (messageText.startsWith("/tbm") && taskId) {
+        // AnGenBot 채널이거나 /tbm, /energynews, /designrisk 명령어인 경우 로딩 메시지 추가
+        const isAnGenBotChannel = currentChannel === "anjenbot-safety-bot"
+        const isDesignRiskChannel = currentChannel === "design-risk-agent"
+        const isTbmCommand = trimmedMessage.startsWith("/tbm")
+        const isEnergyNewsCommand = trimmedMessage.startsWith("/energynews")
+        const isDesignRiskCommand = trimmedMessage.startsWith("/designrisk")
+        
+        if (taskId && (isAnGenBotChannel || isDesignRiskChannel || isTbmCommand || isEnergyNewsCommand || isDesignRiskCommand)) {
+          const avatar = isEnergyNewsCommand
+            ? "/assets/energynews.png"
+            : (isDesignRiskChannel || isDesignRiskCommand)
+              ? "/assets/design-risk.png"
+              : "/assets/anjenbot_avatar.png"
+          const sender = isEnergyNewsCommand
+            ? "News Agent"
+            : (isDesignRiskChannel || isDesignRiskCommand)
+              ? "Design Risk Agent"
+              : "anGenbot"
+          
           const loadingMessage: Message = {
-            sender: "안젠봇",
+            sender,
             time: timeString,
-            content: "답변을 준비하고 있습니다...",
-            avatar: "/assets/anjenbot_avatar.png",
+            content: "Preparing response...",
+            avatar,
             isBot: true,
             isLoading: true,
             taskId,
@@ -249,7 +352,7 @@ export function SlackApp({
         }
       }
 
-      // MISO 결과가 있으면 해당 taskId의 로딩 메시지를 실제 결과로 교체
+      // 결과가 있으면 해당 taskId의 로딩 메시지를 실제 결과로 교체
       if (result && taskId) {
         // 완료된 작업 결과를 sessionStorage에 저장 (나갔다가 들어왔을 때 복원용)
         try {
@@ -265,6 +368,17 @@ export function SlackApp({
           return prev.map((msg) => {
             // 해당 taskId의 로딩 메시지를 결과 메시지로 교체
             if (msg.taskId === taskId && msg.isLoading) {
+              // 에너지뉴스 명령어인지 확인 (메시지 내용 또는 sender로 판단)
+              const isEnergyNewsCommand = msg.sender === "News Agent" || msg.content?.includes("Energy News")
+              const isDesignRiskMessage = msg.sender === "Design Risk Agent"
+              const avatar =
+                msg.avatar ||
+                (isEnergyNewsCommand
+                  ? "/assets/energynews.png"
+                  : isDesignRiskMessage
+                    ? "/assets/design-risk.png"
+                    : "/assets/anjenbot_avatar.png")
+              
               // 에러 메시지인 경우
               if (result.startsWith("ERROR:")) {
                 return {
@@ -272,16 +386,43 @@ export function SlackApp({
                   isLoading: false,
                   content: result.replace("ERROR:", ""),
                   isBot: true,
-                  avatar: "/assets/anjenbot_avatar.png", // 안젠봇 아바타 유지
+                  avatar,
+                  attachment: undefined,
                 }
               }
               // 정상 결과인 경우
-              return {
-                ...msg,
-                isLoading: false,
-                content: "MISO 워크플로우 결과",
-                misoResult: result,
-                avatar: "/assets/anjenbot_avatar.png", // 안젠봇 아바타 유지
+              const isAnGenBotChannel = currentChannel === "anjenbot-safety-bot"
+              const isDesignRiskChannel = currentChannel === "design-risk-agent"
+              const originalContent = msg.content || ""
+              const isEnergyNewsResult = isEnergyNewsCommand || originalContent.includes("Preparing response")
+              const shouldRenderAsMarkdown =
+                isAnGenBotChannel || isEnergyNewsResult || isDesignRiskChannel || isDesignRiskMessage
+              
+              if (shouldRenderAsMarkdown) {
+                // 스트리밍이 완료된 경우: 이미 content가 업데이트되어 있으면 그대로 두고 isLoading만 false로 변경
+                // content가 비어있거나 스트리밍이 안 된 경우에만 result로 설정
+                const finalContent = originalContent.trim() !== "Preparing response..." && originalContent.trim() ? originalContent : result
+                return {
+                  ...msg,
+                  isLoading: false,
+                  content: finalContent,
+                  isBot: true,
+                  avatar,
+                  attachment: {
+                    type: "markdown",
+                    title: "",
+                    subtitle: "",
+                  },
+                }
+              } else {
+                // MISO 워크플로우 (TBM): 특별한 형태로 표시 (misoResult 사용)
+                return {
+                  ...msg,
+                  isLoading: false,
+                  content: "MISO 워크플로우 결과",
+                  misoResult: result,
+                  avatar: "/assets/anjenbot_avatar.png", // anGenbot 아바타 유지
+                }
               }
             }
             return msg
@@ -289,7 +430,7 @@ export function SlackApp({
         })
       }
     },
-    []
+    [currentChannel]
   )
 
   return (
@@ -315,12 +456,18 @@ export function SlackApp({
             ) : (
             <MessagesList 
               messages={messages} 
-              containerRef={chatAreaRef}
+              containerRef={chatAreaRef as React.RefObject<HTMLElement>}
             />
             )}
           </div>
 
-          <SlackInput onMessageSent={handleMessageSent} channelName={channelName} />
+          <SlackInput
+            onMessageSent={handleMessageSent}
+            onStreamingUpdate={handleStreamingUpdate}
+            channelName={currentChannel}
+            externalAttachments={externalAttachments}
+            onExternalAttachmentsConsumed={onExternalAttachmentsConsumed}
+          />
         </div>
       </div>
     </div>

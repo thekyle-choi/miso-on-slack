@@ -1,5 +1,14 @@
 import { getAvatar } from "./avatars"
 
+export interface MessageFileAttachment {
+  id: string
+  name: string
+  type: "image" | "document"
+  url: string
+  mimeType: string
+  sizeLabel: string
+}
+
 export interface Message {
   sender: string
   time: string
@@ -19,6 +28,7 @@ export interface Message {
     title: string
     subtitle: string
   }
+  files?: MessageFileAttachment[]
   isLoading?: boolean
   misoResult?: string // MISO 워크플로우 결과 저장
   taskId?: string // 작업 추적을 위한 고유 ID
@@ -83,88 +93,37 @@ export const MOCK_MESSAGES: Message[] = [
   },
 ]
 
-// 발전소 작업 관련 목업 메시지
+// 발전소 관련 목업 메시지
 export const POWERPLANT_MOCK_MESSAGES: Message[] = [
   {
-    sender: "Channel Update Team",
-    time: "AM 8:30",
-    content: "Maintenance Team has reported 🔧 Motor failure in Boiler Confined Space.",
-    avatar: "/placeholder.svg",
-    isBot: true,
-    isUpdate: true,
-  },
-  {
-    sender: "James Park(Maintenance)",
-    time: "AM 8:35",
-    content:
-      "⚠️ URGENT: Motor failure detected in the boiler confined space (Unit 3).\nThe motor stopped responding during routine inspection. Initial assessment shows bearing failure and possible electrical issues. Immediate action required.",
-    avatar: getAvatar("James Park(Maintenance)"),
-    reactions: [
-      { emoji: "⚠️", count: 3 },
-      { emoji: "🔧", count: 2 },
-    ],
-  },
-  {
     sender: "Mike Kim(Team Lead)",
-    time: "AM 8:45",
+    time: "AM 9:30",
     content:
-      "@James Park(Maintenance) @Sarah Lee(Safety) @David Choi(Electrical) \n\n**WORK ORDER ASSIGNED**\n\n**Task:** Motor repair/replacement in Boiler Confined Space (Unit 3)\n**Priority:** High\n**Scheduled Time:** Today 2:00 PM\n**Assigned Team:** Maintenance Crew A (5 members)\n\n**Initial Requirements:**\n- Confined space entry permit\n- Gas detection before entry\n- Ventilation system check\n- PPE and safety equipment\n- Safety observer required\n\nPlease coordinate and prepare accordingly.",
+      "@Team\n\n**URGENT ASSIGNMENT**\n\nThere have been recent incidents at power plants. I need you to investigate and research news articles related to these power plant accidents.\n\nPlease gather comprehensive information about:\n- Recent power plant accidents and incidents\n- Root causes and contributing factors\n- Safety measures and preventive actions\n- Industry trends and patterns\n- Regulatory responses\n\nThis research is critical for our safety protocols and risk assessment. Please compile your findings and share them in this channel.",
     avatar: getAvatar("Mike Kim(Team Lead)"),
     reactions: [
-      { emoji: "✅", count: 4 },
-      { emoji: "👍", count: 2 },
+      { emoji: "📰", count: 3 },
+      { emoji: "✅", count: 2 },
     ],
   },
   {
     sender: "Sarah Lee(Safety)",
-    time: "AM 8:50",
+    time: "AM 9:35",
     content:
-      "@Mike Kim(Team Lead) Confirmed. I'll prepare the confined space entry permit and coordinate gas detection equipment. Safety team will be ready by 1:30 PM.",
+      "@Mike Kim(Team Lead) Understood. I'll start researching recent power plant accidents and compile a comprehensive report. I'll focus on identifying common patterns and safety implications.",
     avatar: getAvatar("Sarah Lee(Safety)"),
     reactions: [
-      { emoji: "✅", count: 2 },
+      { emoji: "✅", count: 1 },
     ],
   },
   {
     sender: "David Choi(Electrical)",
-    time: "AM 8:55",
+    time: "AM 9:40",
     content:
-      "@Mike Kim(Team Lead) Understood. I'll coordinate power isolation for Unit 3 boiler area. Electrical lockout/tagout will be completed by 1:45 PM.",
+      "@Mike Kim(Team Lead) I'll investigate the technical aspects of recent incidents, focusing on electrical failures, equipment malfunctions, and operational issues that may have contributed to these accidents.",
     avatar: getAvatar("David Choi(Electrical)"),
     reactions: [
-      { emoji: "✅", count: 2 },
-    ],
-  },
-  {
-    sender: "James Park(Maintenance)",
-    time: "AM 9:00",
-    content:
-      "@Mike Kim(Team Lead) Received. Maintenance Crew A is reviewing the motor specifications and preparing equipment list:\n- Replacement motor (Model: ABB M2BA 132S-4)\n- Hoisting equipment for confined space\n- Tool inspection in progress\n\nWe'll be ready for the 2:00 PM start time.",
-    avatar: getAvatar("James Park(Maintenance)"),
-    reactions: [
-      { emoji: "✅", count: 3 },
-      { emoji: "🔧", count: 1 },
-    ],
-  },
-  {
-    sender: "Mike Kim(Team Lead)",
-    time: "AM 9:15",
-    content:
-      "@James Park(Maintenance) @Sarah Lee(Safety) @David Choi(Electrical)\n\n**IMPORTANT:** Before proceeding with the work, please prepare a **TBM (Task-Based Method) document** for this confined space motor repair task.\n\nThe TBM should include:\n- Detailed work procedures\n- Safety protocols specific to confined space entry\n- Step-by-step task sequence\n- Risk assessment and mitigation measures\n- Equipment and tool requirements\n- Emergency response procedures\n\nPlease complete the TBM document preparation before the pre-work briefing at 1:30 PM. This is mandatory for confined space operations.",
-    avatar: getAvatar("Mike Kim(Team Lead)"),
-    reactions: [
-      { emoji: "📋", count: 3 },
-      { emoji: "✅", count: 2 },
-    ],
-  },
-  {
-    sender: "James Park(Maintenance)",
-    time: "AM 9:20",
-    content:
-      "@Mike Kim(Team Lead) Understood. We'll prepare the TBM document immediately. I'll coordinate with the team to gather all necessary information and create a comprehensive task-based method document for this confined space motor repair operation.",
-    avatar: getAvatar("James Park(Maintenance)"),
-    reactions: [
-      { emoji: "✅", count: 2 },
+      { emoji: "✅", count: 1 },
     ],
   },
 ]
@@ -224,7 +183,7 @@ export const HR_POLICY_MOCK_MESSAGES: Message[] = [
   },
 ]
 
-// 안젠봇(Safety Bot) 관련 목업 메시지
+// anGenbot(Safety Bot) 관련 목업 메시지
 export const ANJENBOT_SAFETY_MOCK_MESSAGES: Message[] = [
   {
     sender: "AnGenBot(Safety Bot)",
@@ -232,6 +191,18 @@ export const ANJENBOT_SAFETY_MOCK_MESSAGES: Message[] = [
     content:
       "Hello! I'm AnGenBot, your Safety Bot. I can help you with safety protocols, risk assessments, TBM (Task-Based Method) document generation, and workplace safety procedures.\n\nHow can I assist you with safety-related tasks today?",
     avatar: "/assets/anjenbot_avatar.png",
+    isBot: true,
+  },
+]
+
+// 디자인 리스크 에이전트 관련 목업 메시지
+export const DESIGN_RISK_AGENT_MOCK_MESSAGES: Message[] = [
+  {
+    sender: "Design Risk Agent",
+    time: "AM 9:00",
+    content:
+      "Hello! I'm the Design Risk Agent. I analyze creative assets for brand, compliance, and legal risks. Share your design context or provide a link, and I'll highlight potential issues along with mitigation suggestions.",
+    avatar: "/assets/design-risk.png",
     isBot: true,
   },
 ]
@@ -254,15 +225,38 @@ export const GENERAL_CHANNEL_MESSAGES: Message[] = []
 // 빈 채팅창용 메시지
 export const EMPTY_CHANNEL_MESSAGES: Message[] = []
 
+// Ally 다이렉트 메시지 목업
+export const ALLY_MOCK_MESSAGES: Message[] = [
+  {
+    sender: "Ally",
+    time: "AM 10:00",
+    content: "안녕하세요! Ally입니다. 무엇을 도와드릴까요?",
+    avatar: getAvatar("Ally"),
+  },
+]
+
+// Zoey 다이렉트 메시지 목업
+export const ZOEY_MOCK_MESSAGES: Message[] = [
+  {
+    sender: "Zoey",
+    time: "AM 10:00",
+    content: "안녕하세요! Zoey입니다. 무엇을 도와드릴까요?",
+    avatar: getAvatar("Zoey"),
+  },
+]
+
 // 채널별 목업 메시지 맵
 export const CHANNEL_MOCK_MESSAGES: Record<string, Message[]> = {
   "일반": GENERAL_CHANNEL_MESSAGES,
   "gs-holdings-52g-salesforce-slack": MOCK_MESSAGES,
   "gs-graphon": MOCK_MESSAGES,
-  "gs-52g-powerplant-tbm": POWERPLANT_MOCK_MESSAGES,
+  "gs-52g-powerplant": POWERPLANT_MOCK_MESSAGES,
   "gs-52g-design-group": DESIGN_GROUP_MOCK_MESSAGES,
   "anjenbot-safety-bot": ANJENBOT_SAFETY_MOCK_MESSAGES,
+  "design-risk-agent": DESIGN_RISK_AGENT_MOCK_MESSAGES,
   "hr-policy-agent": HR_POLICY_MOCK_MESSAGES,
   "plai-maker": PLAI_MAKER_MOCK_MESSAGES,
+  "ally": ALLY_MOCK_MESSAGES,
+  "zoey": ZOEY_MOCK_MESSAGES,
 }
 
